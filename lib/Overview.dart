@@ -1,3 +1,4 @@
+import 'package:financetracker/main.dart';
 import 'package:flutter/material.dart';
 
 class Overview extends StatefulWidget {
@@ -18,18 +19,45 @@ class _OverviewState extends State<Overview> {
 
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            "Monthly Income:",
+          Column(
+            children: [
+              Text(
+                  "You started with:",
+              ),
+              Text(
+                MyHomePage.manager != null ? MyHomePage.manager.startingMoney.toString() + " €" : "",
+                style: TextStyle(
+                  fontSize: 22
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                "Spent",
+              Column(
+                children: [
+                  Text("Spent:"),
+                  Text(
+                    MyHomePage.manager != null ? MyHomePage.manager.spentMoney.toString() + " €" : "",
+                    style: TextStyle(
+                      fontSize: 26
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                "Remaining",
+              Column(
+                children: [
+                  Text("Remaining:"),
+                  Text(
+                    MyHomePage.manager != null ? MyHomePage.manager.remainingMoney.toString() + " €" : "",
+                    style: TextStyle(
+                      fontSize: 26
+                    ),
+                  ),
+                ],
               ),
             ],
           )

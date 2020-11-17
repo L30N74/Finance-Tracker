@@ -1,3 +1,4 @@
+import 'package:financetracker/CreateManager.dart';
 import 'package:financetracker/Database.dart';
 import 'package:financetracker/Manager.dart';
 import 'package:financetracker/Overview.dart';
@@ -22,13 +23,13 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+  static Manager manager;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static Manager manager;
 
   @override
   Widget build(BuildContext context) {
@@ -36,21 +37,25 @@ class _MyHomePageState extends State<MyHomePage> {
     SQLiteDbProvider.db.getOverviewDetails().then((mgr) => {
       if(mgr == null) {
         // Create pop-up to instantiate new manager
-        CreateManagerAlert(context)
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateManager()))
+        //CreateManagerAlert(context)
       }
       else {
         //There already exists a manager for this month. Retrieve data
-        manager = mgr
+        MyHomePage.manager = mgr
       }
     });
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black87,
+        //backgroundColor: Colors.black87,
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Overview(),
+            SizedBox(height: 30,),
+            Container(
+              child: Text("Test"),
+            )
           ],
         ),
       ),
@@ -75,14 +80,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   onSubmitted: (String value) async {
-                    manager = await SQLiteDbProvider.db.insertNewManager(double.parse(value), new DateTime(DateTime.now().year, DateTime.now().month, 1));
+                    MyHomePage.manager = await SQLiteDbProvider.db.insertNewManager(double.parse(value), new DateTime(DateTime.now().year, DateTime.now().month, 1));
                   },
                 ),
                 FlatButton(
                   child: Text("Submit"),
                   onPressed: () => {
                     SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), new DateTime(DateTime.now().year, DateTime.now().month, 1)).then((mgr) => {
-                      manager = mgr,
+                      MyHomePage.manager = mgr,
                       Navigator.of(context).pop()
                     })
                   }),
