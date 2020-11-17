@@ -1,8 +1,10 @@
+import 'package:financetracker/CreateExpense.dart';
 import 'package:financetracker/CreateManager.dart';
 import 'package:financetracker/Database.dart';
-import 'package:financetracker/Manager.dart';
+import 'package:financetracker/Classes/Manager.dart';
 import 'package:financetracker/Overview.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,11 +36,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
 
-    SQLiteDbProvider.db.getOverviewDetails().then((mgr) => {
+    SQLiteDbProvider.db.getManager().then((mgr) => {
       if(mgr == null) {
-        // Create pop-up to instantiate new manager
+        // Redirect user to page to create a new manager
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateManager()))
-        //CreateManagerAlert(context)
       }
       else {
         //There already exists a manager for this month. Retrieve data
@@ -54,9 +55,45 @@ class _MyHomePageState extends State<MyHomePage> {
             Overview(),
             SizedBox(height: 30,),
             Container(
-              child: Text("Test"),
-            )
+              child: RaisedButton(
+                child: Text("Reset Manager"),
+                onPressed: () {
+                  setState(() {
+                    SQLiteDbProvider.db.resetManagerTable();
+                    MyHomePage.manager = null;
+                  });
+                },
+              ),
+            ),
+            Container(
+              child: RaisedButton(
+                child: Text("Reset Expenses"),
+                onPressed: () {
+                  setState(() {
+                    SQLiteDbProvider.db.resetExpensesTable();
+                    MyHomePage.manager.spentMoney = 0;
+                    MyHomePage.manager.remainingMoney = MyHomePage.manager.startingMoney;
+                  });
+                },
+              )
+            ),
           ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Color(0xFF212128),
+          shape: CircularNotchedRectangle(),
+          child: Container(
+            height: 60,
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          width: 80,
+          height: 80,
+          child: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateExpense())),
+          ),
         ),
       ),
     );
@@ -80,13 +117,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   onSubmitted: (String value) async {
-                    MyHomePage.manager = await SQLiteDbProvider.db.insertNewManager(double.parse(value), new DateTime(DateTime.now().year, DateTime.now().month, 1));
+                    MyHomePage.manager = await SQLiteDbProvider.db.insertNewManager(double.parse(value), DateFormat.yM().format(new DateTime(DateTime.now().year, DateTime.now().month, 1)));
                   },
                 ),
                 FlatButton(
                   child: Text("Submit"),
                   onPressed: () => {
-                    SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), new DateTime(DateTime.now().year, DateTime.now().month, 1)).then((mgr) => {
+                    SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), DateFormat.yM().format(new DateTime(DateTime.now().year, DateTime.now().month, 1))).then((mgr) => {
                       MyHomePage.manager = mgr,
                       Navigator.of(context).pop()
                     })
