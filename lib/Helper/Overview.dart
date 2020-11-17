@@ -27,7 +27,7 @@ class _OverviewState extends State<Overview> {
                   "You started with:",
               ),
               Text(
-                MyHomePage.manager != null ? MyHomePage.manager.startingMoney.toString() + " €" : "",
+                MyHomePage.manager != null ?  MyHomePage.manager.startingMoney.toStringAsFixed(2) + " €" : "",
                 style: TextStyle(
                   fontSize: 22
                 ),
@@ -41,7 +41,7 @@ class _OverviewState extends State<Overview> {
                 children: [
                   Text("Spent:"),
                   Text(
-                    MyHomePage.manager != null ? MyHomePage.manager.spentMoney.toString() + " €" : "",
+                    MyHomePage.manager != null ? MyHomePage.manager.spentMoney.toStringAsFixed(2) + " €" : "",
                     style: TextStyle(
                       fontSize: 26
                     ),
@@ -52,7 +52,7 @@ class _OverviewState extends State<Overview> {
                 children: [
                   Text("Remaining:"),
                   Text(
-                    MyHomePage.manager != null ? MyHomePage.manager.remainingMoney.toString() + " €" : "",
+                    MyHomePage.manager != null ? MyHomePage.manager.remainingMoney.toStringAsFixed(2) + " €" : "",
                     style: TextStyle(
                       fontSize: 26
                     ),

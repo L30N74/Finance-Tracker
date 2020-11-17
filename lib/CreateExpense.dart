@@ -1,6 +1,6 @@
 import 'package:financetracker/Classes/Expense.dart';
-import 'package:financetracker/Database.dart';
-import 'package:financetracker/Overview.dart';
+import 'file:///D:/Anderes/Projekte/finance_tracker/lib/Helper/Database.dart';
+import 'package:financetracker/Helper/Overview.dart';
 import 'package:financetracker/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -83,7 +83,7 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Widget ExpenseTypeDropdown() {
     return DropdownButtonFormField(
-      value: ExpenseType.values[0].toString().split(".")[1],
+      value: ExpenseType.Expense.toString().split(".")[1],
       onSaved: (String value) => {
         if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
           newExpense.type = ExpenseType.Expense

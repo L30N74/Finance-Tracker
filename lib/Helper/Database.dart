@@ -34,7 +34,6 @@ class SQLiteDbProvider {
           await db.execute("DROP TABLE IF EXISTS Expenses;");
 
           await db.execute("CREATE TABLE Manager("
-              "id INTEGER PRIMARY KEY,"
               "starting_money TEXT,"
               "spent_money TEXT DEFAULT 0.0,"
               "remaining_money TEXT,"
@@ -43,7 +42,6 @@ class SQLiteDbProvider {
           );
 
           await db.execute("CREATE TABLE Expenses("
-              "id INTEGER PRIMARY KEY,"
               "name TEXT,"
               "date DATE,"
               "place TEXT,"
@@ -84,25 +82,34 @@ class SQLiteDbProvider {
   /// Returns [Manager] with appropriate id in database
   Future<Manager> insertNewManager(double startingMoney, String month) async {
     final db = await database;
-    int id = await db.rawInsert(
-        'INSERT INTO Manager(starting_money, remaining_money, month) VALUES(?, ?, ?);',
-        [ startingMoney.toString(),
-          startingMoney.toString(),
-          month
-        ]);
+    await db.rawInsert(
+      'INSERT INTO Manager(starting_money, remaining_money, month) VALUES(?, ?, ?);',
+      [ startingMoney.toString(),
+        startingMoney.toString(),
+        month
+      ]);
 
-    return new Manager(id, startingMoney, 0, startingMoney, month);
+    return new Manager(startingMoney, 0, startingMoney, month);
   }
-
 
   insertNewExpense(Expense expense) async {
     final db = await database;
-    var result = await db.insert("Expenses", expense.toMap());
-    print("Added new expense with id [$result] to the database");
+    print("-------------- Type: " + expense.type.toString().split(".")[1]);
+    await db.insert("Expenses", expense.toMap());
   }
 
-  Future<List<Expense>> getExpenses(DateTime month) async {
+  Future<List<Expense>> getExpenses(String month) async {
     final db = await database;
     //var result = await db.rawQuery("SELECT * FROM Expenses WHERE month BETWEEN ? AND ?", [('now','start of month','+1 month','-1 day')]);
+    var result = await db.query("Expenses");
+    var iter = result.iterator;
+
+    List<Expense> expenses = new List<Expense>();
+
+    while (iter.moveNext()) {
+      expenses.add(Expense.fromMap(iter.current));
+    }
+
+    return expenses;
   }
 }
