@@ -117,7 +117,6 @@ class SQLiteDbProvider {
   insertNewExpense(Expense expense) async {
     final db = await database;
     await db.insert("Expenses", expense.toMap());
-    print("-------------- Inserted Expense of type: " + expense.type.toString().split(".")[1]);
   }
 
   Future<List<Expense>> getExpenses(DateTime date) async {
@@ -133,11 +132,8 @@ class SQLiteDbProvider {
     var iterator = result.iterator;
 
     while (iterator.moveNext()) {
-      print(iterator.current);
       expenses.add(Expense.fromMap(iterator.current));
     }
-
-    print("------------ " + expenses.length.toString() + " expenses this month");
 
     return expenses;
   }
