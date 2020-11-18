@@ -61,7 +61,6 @@ class _CreateExpenseState extends State<CreateExpense> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(dateStringRep),
-              //Text("[Date]"),*/
               RaisedButton(
                 child: Text("Pick a Date"),
                 onPressed: () {

@@ -125,7 +125,7 @@ class SQLiteDbProvider {
     int beginningDate = (new DateTime(date.year, date.month, 1)).millisecondsSinceEpoch;
     int endDate = (new DateTime(date.year, date.month+1, 0)).millisecondsSinceEpoch;
 
-    var result = await db.rawQuery("SELECT * FROM Expenses WHERE date BETWEEN ? AND ?", [beginningDate, endDate]);
+    var result = await db.query("Expenses", where: "date BETWEEN ? AND ? ORDER BY date DESC", whereArgs: [beginningDate, endDate]);
 
     List<Expense> expenses = new List<Expense>();
 

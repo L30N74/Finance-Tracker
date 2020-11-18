@@ -48,9 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
-    int month = DateTime.now().month;
-    int year = DateTime.now().year;
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color(0xFF212128),
@@ -59,12 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
             Overview(),
             SizedBox(height: 30,),
             ShowExpenses(),
-            //FlatButton(
-            //  child: Text("Test", style: TextStyle(fontSize: 24, color: Colors.white),),
-            //  onPressed: () => {
-            //    print(SQLiteDbProvider.db.getExpenses(DateTime.now()))
-            //  },
-            //),
           ],
         ),
         bottomNavigationBar: MyBottomBar(),
@@ -87,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
       future: SQLiteDbProvider.db.getExpenses(DateTime.now()),
       builder: (context, snapshot) {
         if(snapshot.hasData) {
-          return _builder(snapshot);
+          return _builder(snapshot.data);
         }
         else {
           return Column(
@@ -111,19 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
   _builder(list) {
     return Expanded(
       child: ListView.builder(
-        shrinkWrap: true,
         padding: const EdgeInsets.only(top: 20, bottom: 100),
-        itemCount: list.data.length,
-        itemBuilder: (BuildContext context, int index) {
-          return CreateExpenseItem(list, index);
-        },
+        itemCount: list.length,
+        itemBuilder: (BuildContext context, int index) => CreateExpenseItem(list[index])
       ),
     );
   }
 
-  Widget CreateExpenseItem(list, index) {
-    //String[] dateSplits = DateTime.fromMillisecondsSinceEpoch(list.data[index].date).toString().split("");
-    //String date = dateSplits[0].toString();
+  Widget CreateExpenseItem(expense) {
+    print(expense.type.toString());
 
     return Container(
       height: 100,
@@ -149,13 +136,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(20)),
-                  color: list.data[index].type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Color.fromRGBO(10, 200, 30, 1),
+                  color: expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Color.fromRGBO(10, 200, 30, 1),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10),
                 child: Text(
-                  DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(list.data[index].date)),
+                  expense.getDateAsString(), // DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(list.data[index].date)),
                   style: TextStyle(),
                 ),
               ),
@@ -168,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Text(
-                  list.data[index].name,
+                  expense.name,
                   style: TextStyle(fontSize: 24),
                   textAlign: TextAlign.right,
                 ),
@@ -176,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: Text(
-                    (list.data[index].type == ExpenseType.Expense ? "-" : "+") + list.data[index].amount.toString(),
+                    (expense.type == ExpenseType.Expense ? "-" : "+") + expense.amount.toString() + "€",
                     style: TextStyle(fontSize: 24),
                   )
               ),
@@ -189,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Text(
-                  list.data[index].place,
+                  expense.place,
                   style: TextStyle(),
                 ),
               ),
@@ -203,14 +190,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget MyBottomBar() {
     return BottomAppBar(
-      color: Color(0xFF212128),
+      color: Colors.white, //Color(0xFF216128),
       shape: CircularNotchedRectangle(),
       child: Container(
         height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            MaterialButton(
+            /*MaterialButton(
               child: Icon(Icons.delete_forever, color: Colors.white, size: 30,),
               onPressed: () {
                 setState(() {
@@ -236,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
 
               },
-            ),
+            ),*/
           ],
         ),
       ),

@@ -11,10 +11,10 @@ class _OverviewState extends State<Overview> {
   Widget build(BuildContext context) {
     return Container(
       height: 150,
-      margin: EdgeInsets.all(20),
+      margin: EdgeInsets.only(left: 20, right: 20),
       width: MediaQuery.of(context).size.width-20,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(5), topRight: Radius.circular(5), bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
         color: Colors.white,
 
       ),
