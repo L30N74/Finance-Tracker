@@ -195,8 +195,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            /*MaterialButton(
-              child: Icon(Icons.delete_forever, color: Colors.white, size: 30,),
+            MaterialButton(
+              child: Text("Reset Managers"),
               onPressed: () {
                 setState(() {
                   SQLiteDbProvider.db.resetManagerTable();
@@ -204,9 +204,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
             ),
-            SizedBox(width: 80,),
+            SizedBox(width: 30,),
             MaterialButton(
-              child: Icon(Icons.delete_outlined, color: Colors.white, size: 30,),
+              child: Text("Reset Expenses"),
               onPressed: () {
                 setState(() {
                   SQLiteDbProvider.db.resetExpensesTable();
@@ -216,12 +216,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
             ),
-            MaterialButton(
-              child: Text("Debug", style: TextStyle(color: Colors.white, fontSize: 16),),
-              onPressed: () {
-
-              },
-            ),*/
           ],
         ),
       ),

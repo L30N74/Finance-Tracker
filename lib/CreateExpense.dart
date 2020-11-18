@@ -16,6 +16,7 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Expense newExpense = new Expense(
     type: ExpenseType.Expense,
+    date: DateTime.now().millisecondsSinceEpoch,
     isMonthly: false
   );
 
@@ -52,7 +53,6 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Widget DateFormField() {
     DateTime now = DateTime.now();
-    String dateStringRep = newExpense.date == null ? "Pick a Date" : DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(newExpense.date));
 
     return Column(
       children: [
@@ -60,7 +60,7 @@ class _CreateExpenseState extends State<CreateExpense> {
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(dateStringRep),
+              Text(newExpense.getDateAsString()),
               RaisedButton(
                 child: Text("Pick a Date"),
                 onPressed: () {
