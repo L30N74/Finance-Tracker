@@ -110,8 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget CreateExpenseItem(expense) {
-    print(expense.type.toString());
-
     return Container(
       height: 100,
       alignment: Alignment.centerLeft,

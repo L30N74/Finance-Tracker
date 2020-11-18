@@ -142,7 +142,6 @@ class _CreateExpenseState extends State<CreateExpense> {
         return double.tryParse(value) == null ? "Please enter a valid number" : null;
       },
       onSaved: (String value) => {
-        print("------------ Expense amount = " + double.parse(value).toString()),
         newExpense.amount = double.parse(value)
       },
     );
