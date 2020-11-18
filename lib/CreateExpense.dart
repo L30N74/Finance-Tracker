@@ -52,6 +52,7 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Widget DateFormField() {
     DateTime now = DateTime.now();
+    String dateStringRep = newExpense.date == null ? "Pick a Date" : DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(newExpense.date));
 
     return Column(
       children: [
@@ -59,7 +60,8 @@ class _CreateExpenseState extends State<CreateExpense> {
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(newExpense.date == null ? 'Pick a Date' : newExpense.date),
+              Text(dateStringRep),
+              //Text("[Date]"),*/
               RaisedButton(
                 child: Text("Pick a Date"),
                 onPressed: () {
@@ -68,9 +70,9 @@ class _CreateExpenseState extends State<CreateExpense> {
                       initialDate: now,
                       firstDate: new DateTime(now.year, now.month, 1),
                       lastDate: new DateTime(now.year, now.month+1, 0)
-                  ).then((date) {
+                  ).then((DateTime date) {
                     setState(() {
-                      newExpense.date = DateFormat.yMd().format(date);
+                      newExpense.date = date.millisecondsSinceEpoch;
                     });
                   });
                 },
@@ -140,7 +142,10 @@ class _CreateExpenseState extends State<CreateExpense> {
       validator: (String value) {
         return double.tryParse(value) == null ? "Please enter a valid number" : null;
       },
-      onSaved: (String value) => newExpense.amount = double.parse(value),
+      onSaved: (String value) => {
+        print("------------ Expense amount = " + double.parse(value).toString()),
+        newExpense.amount = double.parse(value)
+      },
     );
   }
 

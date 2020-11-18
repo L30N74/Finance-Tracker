@@ -43,7 +43,7 @@ class SQLiteDbProvider {
 
           await db.execute("CREATE TABLE Expenses("
               "name TEXT,"
-              "date DATE,"
+              "date INTEGER,"
               "place TEXT,"
               "amount NUMBER,"
               "type TEXT,"
@@ -66,10 +66,32 @@ class SQLiteDbProvider {
     await db.delete("Expenses");
   }
 
-  Future<Manager> getManager() async {
+  ///Retrieves the manager for this month
+  ///
+  /// Returns a [Manager] if there is one for this month, otherwise [null] if there isn't
+  Future<Manager> getCurrentManager() async {
     final db = await database;
-    var result = await db.query("Manager"); //, where: "month = ?", whereArgs: [new DateTime(DateTime.now().month, DateTime.now().year)]);
+
+    //Get the date the manager should be assigned to if he exists
+    DateTime now = DateTime.now();
+    String beginningDate = DateFormat.yM().format(new DateTime(now.year, now.month, 1));
+
+    //Retrieve manager of this month
+    var result = await db.query("Manager", where: "month = ?", whereArgs: [beginningDate]);
+
     return result.isNotEmpty ? Manager.fromMap(result.first) : null;
+  }
+
+  Future<List<Manager>> getAllManagers() async {
+    final db = await database;
+    List<Manager> managerList = new List<Manager>();
+
+    var result = await db.query("Manager");
+
+    while(result.iterator.moveNext())
+      managerList.add(Manager.fromMap(result.iterator.current));
+
+    return managerList;
   }
 
   updateManager(Manager manager) async {
@@ -94,21 +116,28 @@ class SQLiteDbProvider {
 
   insertNewExpense(Expense expense) async {
     final db = await database;
-    print("-------------- Type: " + expense.type.toString().split(".")[1]);
     await db.insert("Expenses", expense.toMap());
+    print("-------------- Inserted Expense of type: " + expense.type.toString().split(".")[1]);
   }
 
-  Future<List<Expense>> getExpenses(String month) async {
+  Future<List<Expense>> getExpenses(DateTime date) async {
     final db = await database;
-    //var result = await db.rawQuery("SELECT * FROM Expenses WHERE month BETWEEN ? AND ?", [('now','start of month','+1 month','-1 day')]);
-    var result = await db.query("Expenses");
-    var iter = result.iterator;
+
+    int beginningDate = (new DateTime(date.year, date.month, 1)).millisecondsSinceEpoch;
+    int endDate = (new DateTime(date.year, date.month+1, 0)).millisecondsSinceEpoch;
+
+    var result = await db.rawQuery("SELECT * FROM Expenses WHERE date BETWEEN ? AND ?", [beginningDate, endDate]);
 
     List<Expense> expenses = new List<Expense>();
 
-    while (iter.moveNext()) {
-      expenses.add(Expense.fromMap(iter.current));
+    var iterator = result.iterator;
+
+    while (iterator.moveNext()) {
+      print(iterator.current);
+      expenses.add(Expense.fromMap(iterator.current));
     }
+
+    print("------------ " + expenses.length.toString() + " expenses this month");
 
     return expenses;
   }

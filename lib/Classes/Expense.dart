@@ -1,6 +1,6 @@
 class Expense {
   String name;
-  String date;
+  int date;
   String place;
   double amount;
   ExpenseType type;
@@ -11,10 +11,10 @@ class Expense {
   factory Expense.fromMap(Map<String, dynamic> data) {
     return Expense(
       name: data['name'],
-      date: data['date'],
+      date: int.parse(data['date']),
       isMonthly: data['isMonthly'] == 1 ? true : false,
       place: data['place'],
-      amount: data['amount'],
+      amount: double.parse(data['amount'].toString()),
       type: data['type'].toString().compareTo(ExpenseType.Expense.toString()) == 0 ?
               ExpenseType.Expense : ExpenseType.Income
     );

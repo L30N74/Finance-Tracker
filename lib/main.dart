@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
 
-    SQLiteDbProvider.db.getManager().then((mgr) => {
+    SQLiteDbProvider.db.getCurrentManager().then((mgr) => {
       if(mgr == null) {
         // Redirect user to page to create a new manager
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateManager()))
@@ -48,6 +48,9 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
+    int month = DateTime.now().month;
+    int year = DateTime.now().year;
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color(0xFF212128),
@@ -55,7 +58,13 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Overview(),
             SizedBox(height: 30,),
-            ShowExpenses(),
+            //ShowExpenses(),
+            FlatButton(
+              child: Text("Test", style: TextStyle(fontSize: 24, color: Colors.white),),
+              onPressed: () => {
+                print(SQLiteDbProvider.db.getExpenses(DateTime.now()))
+              },
+            ),
           ],
         ),
         bottomNavigationBar: MyBottomBar(),
@@ -75,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget ShowExpenses() {
     return FutureBuilder(
-      future: SQLiteDbProvider.db.getExpenses(""),
+      future: SQLiteDbProvider.db.getExpenses(DateTime.now()),
       builder: (context, list) {
         if(list.connectionState == ConnectionState.none && list.hasData == null)
           return Expanded(
@@ -126,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Padding(
                       padding: EdgeInsets.only(right: 10),
                       child: Text(
-                        list.data[index].date,
+                        DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(list.data[index].date)),
                         style: TextStyle(),
                       ),
                     ),

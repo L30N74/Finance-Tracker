@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 class CreateManager extends StatelessWidget {
   TextEditingController controller = TextEditingController();
 
+  DateTime now = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -33,7 +35,7 @@ class CreateManager extends StatelessWidget {
               ),
               child: Text("Submit"),
               onPressed: () => {
-                SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), DateFormat.yM().format(new DateTime(DateTime.now().year, DateTime.now().month, 1))).then((mgr) => {
+                SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), DateFormat.yM().format(new DateTime(now.year, now.month, 1))).then((mgr) => {
                   MyHomePage.manager = mgr,
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()))
                 })
