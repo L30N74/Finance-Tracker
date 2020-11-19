@@ -1,9 +1,11 @@
 import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
-import 'file:///D:/Anderes/Projekte/finance_tracker/lib/Helper/Database.dart';
+import 'package:financetracker/Classes/ExpenseGroup.dart';
+import 'package:financetracker/Helper/Database.dart';
 import 'package:financetracker/Helper/Overview.dart';
 import 'package:financetracker/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class CreateExpense extends StatefulWidget {
   CreateExpense({Key key}) : super(key: key);
@@ -12,15 +14,19 @@ class CreateExpense extends StatefulWidget {
 }
 
 class _CreateExpenseState extends State<CreateExpense> {
-  final _formKey = GlobalKey<FormState>();
+  final _mainFormKey = GlobalKey<FormState>();
+  final _colorFormKey = GlobalKey<FormState>();
 
   Expense newExpense = new Expense(
     type: ExpenseType.Expense,
     date: DateTime.now().millisecondsSinceEpoch,
-    isMonthly: false
+    isMonthly: false,
+    group: new ExpenseGroup(),
   );
 
   bool shouldRepeat = false;
+  Color pickerColor = Color(0xFF44a49);
+  Color currentColor = Color(0xFF44a49);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +39,7 @@ class _CreateExpenseState extends State<CreateExpense> {
               children: [
                 Overview(),
                 Form(
-                  key: _formKey,
+                  key: _mainFormKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -43,6 +49,7 @@ class _CreateExpenseState extends State<CreateExpense> {
                       DateFormField(),
                       RepeatCheckbox(),
                       if(shouldRepeat) RepetitionField(),
+                      GroupField(),
                       SizedBox(height: 20,),
                       PlaceFormField(),
                       SizedBox(height: 20,),
@@ -232,6 +239,91 @@ class _CreateExpenseState extends State<CreateExpense> {
     );
   }
 
+  Widget GroupField() {
+    String groupName = "";
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Text(
+          "Assign a group",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        Container(
+          color: currentColor,
+          width: 100,
+          child: Text(""),
+        ),
+        /*Container(
+          width: 100,
+          child: DropdownButtonFormField(
+            item
+          ),
+        )*/
+        RaisedButton(
+          child: Text(
+            "Create Group",
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () => {
+            //Create popup to create a new group
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Create a new Group"),
+                  content: SingleChildScrollView(
+                    child: Form(
+                      key: _colorFormKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            decoration: InputDecoration(
+                              labelText: "The group's name",
+                              labelStyle: TextStyle(),
+                            ),
+                            onSaved: (String value) => groupName = value,
+                          ),
+                          BlockPicker(
+                            pickerColor: pickerColor,
+                            onColorChanged: (Color color) {
+                              setState(() {
+                                pickerColor = color;
+                              });
+                            }
+                          ),
+                          FlatButton(
+                            child: Text("Done"),
+                            onPressed: () {
+                              _colorFormKey.currentState.validate();
+
+                              setState(() => {
+                                currentColor = pickerColor,
+                                newExpense.group.setColor(pickerColor),
+                                newExpense.group.name = groupName,
+
+                                //Notify database
+                                SQLiteDbProvider.db.insertNexGroup(newExpense.group)
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            ),
+          },
+        ),
+      ],
+    );
+  }
+
   Widget PlaceFormField() {
     return Container(
       width: MediaQuery.of(context).size.width / 1.3,
@@ -331,8 +423,8 @@ class _CreateExpenseState extends State<CreateExpense> {
         borderRadius: BorderRadius.circular(25),
       ),
       onPressed: () {
-        if(_formKey.currentState.validate()) {
-          _formKey.currentState.save();
+        if(_mainFormKey.currentState.validate()) {
+          _mainFormKey.currentState.save();
 
           //Save Expense in database
           SQLiteDbProvider.db.insertNewExpense(newExpense);

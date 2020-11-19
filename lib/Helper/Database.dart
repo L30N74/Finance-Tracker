@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:financetracker/Classes/Expense.dart';
+import 'package:financetracker/Classes/ExpenseGroup.dart';
 import 'package:financetracker/Classes/Manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -47,7 +48,15 @@ class SQLiteDbProvider {
               "place TEXT,"
               "amount NUMBER,"
               "type TEXT,"
-              "isMonthly NUMBER"
+              "isMonthly NUMBER,"
+              "group INTEGER,"
+              "FOREIGN KEY(group) REFERENCES Expensegroup(ROWID)"
+            ");"
+          );
+
+          await db.execute("CREATE TABLE Expensegroup("
+              "name TEXT,"
+              "color TEXT"
             ");"
           );
         }
@@ -136,5 +145,12 @@ class SQLiteDbProvider {
     }
 
     return expenses;
+  }
+
+  insertNexGroup(ExpenseGroup group) async {
+    var db = await database;
+    await db.insert("Expensegroup", group.toMap());
+
+    print("--------------- Inserted new group with name ${group.name} and color ${group.color}");
   }
 }

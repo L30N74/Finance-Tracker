@@ -1,3 +1,5 @@
+import 'package:financetracker/Classes/ExpenseGroup.dart';
+
 class Expense {
   String name;
   int date;
@@ -5,8 +7,9 @@ class Expense {
   double amount;
   ExpenseType type;
   bool isMonthly;
+  ExpenseGroup group;
 
-  Expense({this.name, this.date, this.isMonthly, this.place, this.amount, this.type});
+  Expense({this.name, this.date, this.isMonthly, this.place, this.amount, this.type, this.group});
 
   factory Expense.fromMap(Map<String, dynamic> data) {
     return Expense(
@@ -16,7 +19,8 @@ class Expense {
       place: data['place'],
       amount: double.parse(data['amount'].toString()),
       type: data['type'].toString().compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0 ?
-              ExpenseType.Expense : ExpenseType.Income
+              ExpenseType.Expense : ExpenseType.Income,
+      group: data['group']
     );
   }
 
@@ -26,7 +30,8 @@ class Expense {
     "isMonthly": isMonthly ? 1 : 0,
     "place": place,
     "amount": amount,
-    "type": type.toString().split(".")[1] //Remove the "Expensetype." from the enum
+    "type": type.toString().split(".")[1], //Remove the "Expensetype." from the enum
+    "group": group
   };
 
 
