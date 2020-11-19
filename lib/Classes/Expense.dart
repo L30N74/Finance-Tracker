@@ -1,4 +1,6 @@
 import 'package:financetracker/Classes/ExpenseGroup.dart';
+import 'package:financetracker/Helper/Database.dart';
+import 'package:flutter/cupertino.dart';
 
 class Expense {
   String name;
@@ -12,15 +14,22 @@ class Expense {
   Expense({this.name, this.date, this.isMonthly, this.place, this.amount, this.type, this.group});
 
   factory Expense.fromMap(Map<String, dynamic> data) {
+    String colorWork = (data["color"].toString().length > 18) ?
+            data["color"].toString().substring(35).split(")")[0] :  //Get rid of "Materialcolor(...)
+            data["color"].toString().substring(6).split(")")[0];
+
     return Expense(
-      name: data['name'],
-      date: data['date'],
-      isMonthly: data['isMonthly'] == 1 ? true : false,
-      place: data['place'],
-      amount: double.parse(data['amount'].toString()),
-      type: data['type'].toString().compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0 ?
-              ExpenseType.Expense : ExpenseType.Income,
-      group: data['group']
+        name: data['name'],
+        date: data['date'],
+        isMonthly: data['isMonthly'] == 1 ? true : false,
+        place: data['place'],
+        amount: double.parse(data['amount'].toString()),
+        type: data['type'].toString().compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0 ?
+        ExpenseType.Expense : ExpenseType.Income,
+        group: new ExpenseGroup(
+          name: data["groupName"],
+          color: colorWork
+        )
     );
   }
 
@@ -31,7 +40,7 @@ class Expense {
     "place": place,
     "amount": amount,
     "type": type.toString().split(".")[1], //Remove the "Expensetype." from the enum
-    "group": group
+    "groupId": group.id
   };
 
 
@@ -46,6 +55,10 @@ class Expense {
     value = "$day.$month.$year";
 
     return value;
+  }
+
+  String toString() {
+    return "{$name; $getDateAsString(); $isMonthly; $place; $amount; $type; ${group.id}}";
   }
 }
 

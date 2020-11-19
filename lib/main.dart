@@ -233,6 +233,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
             ),
+            MaterialButton(
+              child: Text("Reset Groups"),
+              onPressed: () {
+                setState(() {
+                  SQLiteDbProvider.db.resetGroupsTable();
+                });
+              },
+            ),
           ],
         ),
       ),

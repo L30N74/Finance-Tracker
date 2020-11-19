@@ -4,6 +4,7 @@ import 'package:financetracker/Classes/Expense.dart';
 import 'package:financetracker/Classes/ExpenseGroup.dart';
 import 'package:financetracker/Classes/Manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,6 +34,8 @@ class SQLiteDbProvider {
         onCreate: (Database db, int version) async {
           await db.execute("DROP TABLE IF EXISTS Manager;");
           await db.execute("DROP TABLE IF EXISTS Expenses;");
+          await db.execute("DROP TABLE IF EXISTS Expensegroup;");
+
 
           await db.execute("CREATE TABLE Manager("
               "starting_money TEXT,"
@@ -42,6 +45,16 @@ class SQLiteDbProvider {
             ");"
           );
 
+          print("Manager table initialized.");
+
+          await db.execute("CREATE TABLE Expensegroup("
+              "groupName TEXT,"
+              "color TEXT"
+              ");"
+          );
+
+          print("Expensegroup table initialized.");
+
           await db.execute("CREATE TABLE Expenses("
               "name TEXT,"
               "date INTEGER,"
@@ -49,30 +62,32 @@ class SQLiteDbProvider {
               "amount NUMBER,"
               "type TEXT,"
               "isMonthly NUMBER,"
-              "group INTEGER,"
-              "FOREIGN KEY(group) REFERENCES Expensegroup(ROWID)"
+              "groupId NUMBER,"
+              "FOREIGN KEY(groupId) REFERENCES Expensegroup(ROWID)"
             ");"
           );
 
-          await db.execute("CREATE TABLE Expensegroup("
-              "name TEXT,"
-              "color TEXT"
-            ");"
-          );
+          print("Expenses table initialized.");
         }
     );
   }
 
   resetManagerTable() async {
     final db = await database;
-
     await db.delete("Manager");
+    print("INFO [Manager reset]");
   }
 
   resetExpensesTable() async {
     final db = await database;
-
     await db.delete("Expenses");
+    print("INFO [Expenses reset]");
+  }
+
+  resetGroupsTable() async {
+    final db = await database;
+    await db.delete("Expensegroup");
+    print("INFO [Groups reset]");
   }
 
   ///Retrieves the manager for this month
@@ -126,6 +141,33 @@ class SQLiteDbProvider {
   insertNewExpense(Expense expense) async {
     final db = await database;
     await db.insert("Expenses", expense.toMap());
+    //await Debug(expense);
+  }
+
+  Debug(expense) async{
+    print("Group Id: ${expense.group.id}");
+    print("--------Expense:-------------");
+    print(expense.toString());
+    print("--------Expense's group:-------------");
+    print(expense.group.toString());
+
+    var result = await getGroupById(expense.group); // db.query("Expensegroup", where: "ROWID = ?", whereArgs: [expense.group.id]);
+    print("-----------From database:-------------");
+    print(result.toString());
+
+    print("-----------All groups:-----------");
+    var groups = await getAllGroups();
+    var iterator = groups.iterator;
+    while(iterator.moveNext()) {
+      print(iterator.current);
+    }
+
+    print("-----------All expenses:-----------");
+    var expenses = await getExpenses(DateTime.now());
+    var exIterator = expenses.iterator;
+    while(exIterator.moveNext()) {
+      print(exIterator.current);
+    }
   }
 
   Future<List<Expense>> getExpenses(DateTime date) async {
@@ -134,7 +176,7 @@ class SQLiteDbProvider {
     int beginningDate = (new DateTime(date.year, date.month, 1)).millisecondsSinceEpoch;
     int endDate = (new DateTime(date.year, date.month+1, 0)).millisecondsSinceEpoch;
 
-    var result = await db.query("Expenses", where: "date BETWEEN ? AND ? ORDER BY date DESC", whereArgs: [beginningDate, endDate]);
+    var result = await db.rawQuery("SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.date BETWEEN ? AND ? ORDER BY e.date DESC", [beginningDate, endDate]); //where: "date BETWEEN ? AND ? ORDER BY date DESC", whereArgs: [beginningDate, endDate]);
 
     List<Expense> expenses = new List<Expense>();
 
@@ -147,10 +189,32 @@ class SQLiteDbProvider {
     return expenses;
   }
 
-  insertNexGroup(ExpenseGroup group) async {
+  insertNewGroup(ExpenseGroup group) async {
     var db = await database;
-    await db.insert("Expensegroup", group.toMap());
+    return await db.insert("Expensegroup", group.toMap());
+  }
 
-    print("--------------- Inserted new group with name ${group.name} and color ${group.color}");
+  Future<ExpenseGroup> getGroupById(ExpenseGroup group) async {
+    var db = await database;
+    var result = await db.query("Expensegroup", where: "ROWID = ?;", whereArgs: [group.id]);
+
+    if (result.isNotEmpty)
+      return ExpenseGroup.fromMap(result.first);
+    else
+      throw Exception("No Group by the name of '${group.name}'");
+  }
+
+  Future<List<ExpenseGroup>> getAllGroups() async {
+    var db = await database;
+    List<ExpenseGroup> groups = new  List<ExpenseGroup>();
+
+    var result = await db.query("Expensegroup");
+
+    var iterator = result.iterator;
+    while(iterator.moveNext()) {
+      groups.add(ExpenseGroup.fromMap(iterator.current));
+    }
+
+    return groups;
   }
 }

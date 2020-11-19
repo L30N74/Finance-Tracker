@@ -285,11 +285,18 @@ class _CreateExpenseState extends State<CreateExpense> {
                               labelText: "The group's name",
                               labelStyle: TextStyle(),
                             ),
-                            onSaved: (String value) => groupName = value,
+                            validator: (String value) {
+                              return value.length == 0 ? "Please enter something" : null;
+                            },
+                            onSaved: (String value) => {
+                              newExpense.group.name = value,
+                              print("---------- Got $value as the name"),
+                            },
                           ),
                           BlockPicker(
                             pickerColor: pickerColor,
                             onColorChanged: (Color color) {
+                              print(color);
                               setState(() {
                                 pickerColor = color;
                               });
@@ -298,17 +305,18 @@ class _CreateExpenseState extends State<CreateExpense> {
                           FlatButton(
                             child: Text("Done"),
                             onPressed: () {
-                              _colorFormKey.currentState.validate();
+                              if(_colorFormKey.currentState.validate()) {
+                                _colorFormKey.currentState.save();
 
-                              setState(() => {
-                                currentColor = pickerColor,
-                                newExpense.group.setColor(pickerColor),
-                                newExpense.group.name = groupName,
+                                setState(() => {
+                                  currentColor = pickerColor,
+                                  newExpense.group.setColor(pickerColor),
 
-                                //Notify database
-                                SQLiteDbProvider.db.insertNexGroup(newExpense.group)
-                              });
-                              Navigator.of(context).pop();
+                                  //Notify database
+                                  SQLiteDbProvider.db.insertNewGroup(newExpense.group).then((value) => newExpense.group.id = value),
+                                });
+                                Navigator.of(context).pop();
+                              }
                             },
                           )
                         ],

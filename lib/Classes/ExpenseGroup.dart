@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 
 class ExpenseGroup {
+  int id;
   String name;
   String color; //1D1D
 
 
-  ExpenseGroup({this.name, this.color});
+  ExpenseGroup({this.id, this.name, this.color});
 
   factory ExpenseGroup.fromMap(Map<String, dynamic> data) {
-    return ExpenseGroup();
+    return ExpenseGroup(
+      id: data["ROWID"],
+      name: data["groupName"],
+      color: data["color"]
+    );
   }
 
   Map<String, dynamic> toMap() => {
-    "name": name,
+    "ROWID": id,
+    "groupName": name,
     "color": color
   };
 
@@ -22,5 +28,9 @@ class ExpenseGroup {
 
   setColor(Color c) {
     color = c.toString();
+  }
+
+  String toString() {
+    return "{$name; $color}";
   }
 }
