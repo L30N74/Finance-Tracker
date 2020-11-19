@@ -14,18 +14,16 @@ class _OverviewState extends State<Overview> {
       height: 160,
       //margin: EdgeInsets.only(left: 20, right: 20),
       padding: EdgeInsets.only(left: 2, right: 2, bottom: 2),
-      width: MediaQuery.of(context).size.width-18,
+      //width: MediaQuery.of(context).size.width-18,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
+        //borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
         color: lightGreyColor,
 
       ),
       child: Container(
         height: 150,
-        //margin: EdgeInsets.only(left: 20, right: 20),
-        width: MediaQuery.of(context).size.width-20,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
+          //borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
           color: mediumDarkGreyColor,
         ),
         child: Column(

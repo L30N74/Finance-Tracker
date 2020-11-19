@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
   _builder(list) {
     return Expanded(
       child: ListView.builder(
-        padding: const EdgeInsets.only(top: 20, bottom: 100),
+        //padding: const EdgeInsets.only(top: 0, bottom: 100),
         itemCount: list.length,
         itemBuilder: (BuildContext context, int index) => CreateExpenseItem(list[index])
       ),
@@ -148,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(20)),
-                  color: expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Color.fromRGBO(10, 200, 30, 1),
+                  color: expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
                 ),
               ),
               Padding(
@@ -175,8 +175,11 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: Text(
-                    (expense.type == ExpenseType.Expense ? "-" : "+") + expense.amount.toString() + "€",
-                    style: TextStyle(fontSize: 24),
+                    (expense.type == ExpenseType.Expense ? "-" : "+") + expense.amount.toStringAsFixed(2) + "€",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
+                    ),
                   )
               ),
             ],
