@@ -1,9 +1,10 @@
+import 'package:financetracker/Classes/Constants.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseGroup {
   int id;
   String name;
-  String color; //1D1D
+  String color;
 
 
   ExpenseGroup({this.id, this.name, this.color});
@@ -27,7 +28,7 @@ class ExpenseGroup {
   }
 
   setColor(Color c) {
-    color = c.toString();
+    color = formatColor(c.toString());
   }
 
   String toString() {

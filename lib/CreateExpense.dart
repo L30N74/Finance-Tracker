@@ -21,7 +21,7 @@ class _CreateExpenseState extends State<CreateExpense> {
     type: ExpenseType.Expense,
     date: DateTime.now().millisecondsSinceEpoch,
     isMonthly: false,
-    group: new ExpenseGroup(),
+    group: defaultExpenseGroups[0],
   );
 
   bool shouldRepeat = false;
@@ -240,8 +240,6 @@ class _CreateExpenseState extends State<CreateExpense> {
   }
 
   Widget GroupField() {
-    String groupName = "";
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -253,82 +251,153 @@ class _CreateExpenseState extends State<CreateExpense> {
           ),
         ),
         Container(
-          color: currentColor,
-          width: 100,
-          child: Text(""),
-        ),
-        /*Container(
-          width: 100,
-          child: DropdownButtonFormField(
-            item
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: mediumDarkGreyColor,
+            ),
+            child: DropdownButtonHideUnderline(
+              child: FutureBuilder<List<ExpenseGroup>>(
+                future: SQLiteDbProvider.db.getAllGroups(),
+                builder: (context, snapshot) => _groupDrowdownBuilder(context, snapshot),
+              ),
+            ),
           ),
-        )*/
-        RaisedButton(
+        ),
+        FlatButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
           child: Text(
             "Create Group",
             style: TextStyle(color: Colors.white),
           ),
-          onPressed: () => {
-            //Create popup to create a new group
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text("Create a new Group"),
-                  content: SingleChildScrollView(
-                    child: Form(
-                      key: _colorFormKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: "The group's name",
-                              labelStyle: TextStyle(),
-                            ),
-                            validator: (String value) {
-                              return value.length == 0 ? "Please enter something" : null;
-                            },
-                            onSaved: (String value) => {
-                              newExpense.group.name = value,
-                              print("---------- Got $value as the name"),
-                            },
-                          ),
-                          BlockPicker(
-                            pickerColor: pickerColor,
-                            onColorChanged: (Color color) {
-                              print(color);
-                              setState(() {
-                                pickerColor = color;
-                              });
-                            }
-                          ),
-                          FlatButton(
-                            child: Text("Done"),
-                            onPressed: () {
-                              if(_colorFormKey.currentState.validate()) {
-                                _colorFormKey.currentState.save();
-
-                                setState(() => {
-                                  currentColor = pickerColor,
-                                  newExpense.group.setColor(pickerColor),
-
-                                  //Notify database
-                                  SQLiteDbProvider.db.insertNewGroup(newExpense.group).then((value) => newExpense.group.id = value),
-                                });
-                                Navigator.of(context).pop();
-                              }
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }
-            ),
-          },
+          onPressed: () => _colorPickerPopup()
         ),
       ],
+    );
+  }
+
+  _groupDrowdownBuilder(context, snapshot) {
+    var dropDownItemsMap;
+    List<DropdownMenuItem> list = new List<DropdownMenuItem>();
+    int _selectedItem = 0;
+
+    if(snapshot.hasError){
+      return new Container();
+    }
+    else if(snapshot.hasData) {
+      dropDownItemsMap = new Map();
+      list.clear();
+
+      snapshot.data.forEach((group) {
+        int index = snapshot.data.indexOf(group);
+        dropDownItemsMap[index] = group;
+        list.add(new DropdownMenuItem(
+          value: index,
+          child: _groupContainer(group),
+        ));
+      });
+
+      return DropdownButton(
+        items: list,
+        onChanged: (value) => {
+          _selectedItem = list[value].value,
+          setState(() {
+            //selectedItemName = dropDownItemsMap[_selectedItem].name;
+            newExpense.group = dropDownItemsMap[_selectedItem];
+          }),
+        },
+        hint: _groupContainer(newExpense.group),
+      );
+    }
+    else {
+      return CircularProgressIndicator();
+    }
+  }
+
+  _colorPickerPopup() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Create a new Group", textAlign: TextAlign.center,),
+            content: SingleChildScrollView(
+              child: Form(
+                key: _colorFormKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: "The group's name",
+                        labelStyle: TextStyle(),
+                      ),
+                      validator: (String value) {
+                        return value.length == 0 ? "Please enter something" : null;
+                      },
+                      onSaved: (String value) => {
+                        newExpense.group.name = value,
+                      },
+                    ),
+                    BlockPicker(
+                        pickerColor: pickerColor,
+                        onColorChanged: (Color color) {
+                          print(color);
+                          setState(() {
+                            pickerColor = color;
+                          });
+                        }
+                    ),
+                    SizedBox(height: 10,),
+                    FlatButton(
+                      height: 50,
+                      minWidth: 200,
+                      child: Text("Done", style: TextStyle(fontSize: 20),),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      color: Colors.blue,
+                      onPressed: () {
+                        if(_colorFormKey.currentState.validate()) {
+                          _colorFormKey.currentState.save();
+
+                          setState(() => {
+                            currentColor = pickerColor,
+                            newExpense.group.setColor(pickerColor),
+
+                            //Notify database
+                            SQLiteDbProvider.db.insertNewGroup(newExpense.group).then((value) => newExpense.group.id = value),
+                          });
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+    );
+  }
+
+  Widget _groupContainer(ExpenseGroup group) {
+    return Container(
+      //margin: EdgeInsets.symmetric(horizontal: 10),
+      height: 25,
+      width: 100,
+      decoration: BoxDecoration(
+        //borderRadius: BorderRadius.all(Radius.circular(20)),
+        color: group.getColor(), //expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
+      ),
+      child: Center(
+        child: Text(
+          group.name,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 

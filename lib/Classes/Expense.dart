@@ -1,3 +1,4 @@
+import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/ExpenseGroup.dart';
 import 'package:financetracker/Helper/Database.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,10 +15,6 @@ class Expense {
   Expense({this.name, this.date, this.isMonthly, this.place, this.amount, this.type, this.group});
 
   factory Expense.fromMap(Map<String, dynamic> data) {
-    String colorWork = (data["color"].toString().length > 18) ?
-            data["color"].toString().substring(35).split(")")[0] :  //Get rid of "Materialcolor(...)
-            data["color"].toString().substring(6).split(")")[0];
-
     return Expense(
         name: data['name'],
         date: data['date'],
@@ -28,7 +25,7 @@ class Expense {
         ExpenseType.Expense : ExpenseType.Income,
         group: new ExpenseGroup(
           name: data["groupName"],
-          color: colorWork
+          color: data["color"].toString()
         )
     );
   }

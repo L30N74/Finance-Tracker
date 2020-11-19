@@ -36,7 +36,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
 
     SQLiteDbProvider.db.getCurrentManager().then((mgr) => {
       if(mgr == null) {
@@ -45,10 +46,14 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       else {
         //There already exists a manager for this month. Retrieve data
-        MyHomePage.manager = mgr
+        MyHomePage.manager = mgr,
+        setState(() {})
       }
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
@@ -221,8 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
             ),
-            SizedBox(width: 30,),
-            MaterialButton(
+            /*MaterialButton(
               child: Text("Reset Expenses"),
               onPressed: () {
                 setState(() {
@@ -232,12 +236,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   SQLiteDbProvider.db.updateManager(MyHomePage.manager);
                 });
               },
-            ),
+            ),*/
             MaterialButton(
               child: Text("Reset Groups"),
               onPressed: () {
                 setState(() {
                   SQLiteDbProvider.db.resetGroupsTable();
+                });
+              },
+            ),
+            MaterialButton(
+              child: Text("Reset Database"),
+              onPressed: () {
+                setState(() {
+                  SQLiteDbProvider.db.setUpTables();
                 });
               },
             ),
