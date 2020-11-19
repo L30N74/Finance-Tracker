@@ -48,7 +48,18 @@ class _CreateExpenseState extends State<CreateExpense> {
                       SizedBox(height: 20,),
                       PriceFormField(),
                       SizedBox(height: 20,),
-                      ExpenseTypeDropdown(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Select a Type: ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                          ),
+                          ExpenseTypeDropdown(),
+                      ]),
                       SizedBox(height: 20,),
                       SubmitButton(),
                     ],
@@ -272,7 +283,7 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Widget ExpenseTypeDropdown() {
     return Container(
-      width: MediaQuery.of(context).size.width / 1.3,
+      width: MediaQuery.of(context).size.width / 3,
       child: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: mediumDarkGreyColor,
@@ -312,24 +323,27 @@ class _CreateExpenseState extends State<CreateExpense> {
   }
 
   Widget SubmitButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      child: ElevatedButton(
-        onPressed: () {
-          if(_formKey.currentState.validate()) {
-            _formKey.currentState.save();
-
-            //Save Expense in database
-            SQLiteDbProvider.db.insertNewExpense(newExpense);
-
-            //Calculate new money pools (spent money and remaining money)
-            MyHomePage.manager.HandleExpense(newExpense);
-
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()));
-          }
-        },
-        child: Text("Submit"),
+    return FlatButton(
+      color: Colors.blue,
+      minWidth: MediaQuery.of(context).size.width / 1.3,
+      height: 60,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
       ),
+      onPressed: () {
+        if(_formKey.currentState.validate()) {
+          _formKey.currentState.save();
+
+          //Save Expense in database
+          SQLiteDbProvider.db.insertNewExpense(newExpense);
+
+          //Calculate new money pools (spent money and remaining money)
+          MyHomePage.manager.HandleExpense(newExpense);
+
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()));
+        }
+      },
+      child: Text("Submit"),
     );
   }
 }

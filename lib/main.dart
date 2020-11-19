@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           width: 60,
           height: 60,
           child: FloatingActionButton(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.blue,
             child: Icon(Icons.add, size: 28,),
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateExpense())),
           ),
