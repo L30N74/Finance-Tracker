@@ -12,11 +12,12 @@ class _OverviewState extends State<Overview> {
   Widget build(BuildContext context) {
     return Container(
       height: 160,
+      //margin: EdgeInsets.only(left: 20, right: 20),
       padding: EdgeInsets.only(left: 2, right: 2, bottom: 2),
       width: MediaQuery.of(context).size.width-18,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
-        color: Colors.white,
+        color: lightGreyColor,
 
       ),
       child: Container(
@@ -25,8 +26,7 @@ class _OverviewState extends State<Overview> {
         width: MediaQuery.of(context).size.width-20,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
-          color: mainPageBackgroundColor,
-
+          color: mediumDarkGreyColor,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
