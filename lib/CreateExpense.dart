@@ -1,9 +1,9 @@
+import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
 import 'file:///D:/Anderes/Projekte/finance_tracker/lib/Helper/Database.dart';
 import 'package:financetracker/Helper/Overview.dart';
 import 'package:financetracker/main.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class CreateExpense extends StatefulWidget {
   CreateExpense({Key key}) : super(key: key);
@@ -24,6 +24,7 @@ class _CreateExpenseState extends State<CreateExpense> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: mainPageBackgroundColor,
           body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -32,14 +33,21 @@ class _CreateExpenseState extends State<CreateExpense> {
                 Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      SizedBox(height: 20),
                       NameFormField(),
+                      SizedBox(height: 20,),
                       DateFormField(),
+                      SizedBox(height: 20,),
                       IsMonthlyCheckbox(),
+                      SizedBox(height: 20,),
                       PlaceFormField(),
+                      SizedBox(height: 20,),
                       PriceFormField(),
+                      SizedBox(height: 20,),
                       ExpenseTypeDropdown(),
+                      SizedBox(height: 20,),
                       SubmitButton(),
                     ],
                   ),
@@ -51,111 +59,163 @@ class _CreateExpenseState extends State<CreateExpense> {
     );
   }
 
+  Widget NameFormField() {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.3,
+      child: TextFormField(
+        style: basicStyle,
+        decoration: InputDecoration(
+          labelText: "What was the expense for?",
+          labelStyle: basicStyle,
+          errorStyle: errorTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: new BorderSide(),
+          ),
+        ),
+        validator: (String value) {
+          return value.length == 0 ? "Please enter something" : null;
+        },
+        onSaved: (String value) => newExpense.name = value,
+      ),
+    );
+  }
+
   Widget DateFormField() {
     DateTime now = DateTime.now();
 
     return Column(
       children: [
-        Text("When did the expense take place?", textAlign: TextAlign.start,),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(newExpense.getDateAsString()),
-              RaisedButton(
-                child: Text("Pick a Date"),
-                onPressed: () {
-                  showDatePicker(
-                      context: context,
-                      initialDate: now,
-                      firstDate: new DateTime(now.year, now.month, 1),
-                      lastDate: new DateTime(now.year, now.month+1, 0)
-                  ).then((DateTime date) {
-                    setState(() {
-                      newExpense.date = date.millisecondsSinceEpoch;
-                    });
-                  });
-                },
-              )
-            ]
+        Text(
+          "When did the expense take place?",
+          style: basicStyle,
+          textAlign: TextAlign.start,
+        ),
+        OutlineButton(
+          borderSide: BorderSide(
+            color: Colors.white,
+            width: 1,
+          ),
+          color: mainPageBackgroundColor,
+          child: Text(
+            newExpense.getDateAsString(),
+            style: TextStyle(
+              fontSize: 22,
+              color: Colors.white,
+            ),
+          ),
+          onPressed: () {
+            showDatePicker(
+                context: context,
+                initialDate: now,
+                firstDate: new DateTime(now.year, now.month, 1),
+                lastDate: new DateTime(now.year, now.month+1, 0)
+            ).then((DateTime date) {
+              setState(() {
+                newExpense.date = date.millisecondsSinceEpoch;
+              });
+            });
+          },
         ),
       ],
     );
   }
 
-  Widget ExpenseTypeDropdown() {
-    return DropdownButtonFormField(
-      value: ExpenseType.Expense.toString().split(".")[1],
-      onSaved: (String value) => {
-        if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
-          newExpense.type = ExpenseType.Expense
-        else
-          newExpense.type = ExpenseType.Income
-      },
-      onChanged: (String value) {
-        setState(() {
-          if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
-            newExpense.type = ExpenseType.Expense;
-          else
-            newExpense.type = ExpenseType.Income;
-        });
-      },
-      items: ExpenseType.values.map((e) {
-        String type = e.toString().split(".")[1];
-
-        return DropdownMenuItem(
-          value: type,
-          child:
-            Text(
-              type,
-              style: TextStyle(fontSize: 16),
-            ),
-        );
-      }).toList()
-    );
-  }
-
-  Widget NameFormField() {
-    return TextFormField(
-      decoration: InputDecoration(
-          labelText: "What was the expense for?"
-      ),
-      onSaved: (String value) => newExpense.name = value,
-    );
-  }
-
-  Widget PlaceFormField() {
-    return TextFormField(
-      decoration: InputDecoration(
-          labelText: "Where did the expense take place?"
-      ),
-      onSaved: (String value) => newExpense.place = value,
-    );
-  }
-
-  Widget PriceFormField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        labelText: "How much did the expense cost?",
-      ),
-      validator: (String value) {
-        return double.tryParse(value) == null ? "Please enter a valid number" : null;
-      },
-      onSaved: (String value) => {
-        newExpense.amount = double.parse(value)
-      },
-    );
-  }
-
   Widget IsMonthlyCheckbox() {
     return CheckboxListTile(
-      title: Text("is monthly", style: TextStyle(), textAlign: TextAlign.right,),
+      title: Text("is monthly", style: TextStyle(color: Colors.white), textAlign: TextAlign.right,),
       value: newExpense.isMonthly,
       onChanged: (bool value) {
         setState(() {
           newExpense.isMonthly = value;
         });
       },
+    );
+  }
+
+  Widget PlaceFormField() {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.3,
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: "Where did the expense take place?",
+          labelStyle: basicStyle,
+          errorStyle: errorTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: new BorderSide(),
+          ),
+        ),
+        validator: (String value) {
+          return value.length == 0 ? "Please enter something" : null;
+        },
+        onSaved: (String value) => newExpense.place = value,
+      ),
+    );
+  }
+
+  Widget PriceFormField() {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.3,
+      child: TextFormField(
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: "How much did the expense cost?",
+          labelStyle: basicStyle,
+          errorStyle: errorTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: new BorderSide(),
+          ),
+        ),
+        validator: (String value) {
+          return double.tryParse(value) == null ? "Please enter a valid number" : null;
+        },
+        onSaved: (String value) => {
+          newExpense.amount = double.parse(value)
+        },
+      ),
+    );
+  }
+
+  Widget ExpenseTypeDropdown() {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.3,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: mainPageBackgroundColor,
+        ),
+        child: DropdownButtonFormField(
+          value: ExpenseType.Expense.toString().split(".")[1],
+          onSaved: (String value) => {
+            if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
+              newExpense.type = ExpenseType.Expense
+            else
+              newExpense.type = ExpenseType.Income
+          },
+          onChanged: (String value) {
+            setState(() {
+              if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
+                newExpense.type = ExpenseType.Expense;
+              else
+                newExpense.type = ExpenseType.Income;
+            });
+          },
+          items: ExpenseType.values.map((e) {
+            String type = e.toString().split(".")[1];
+
+            return DropdownMenuItem(
+              value: type,
+              child:
+                Text(
+                  type,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+            );
+          }).toList()
+        ),
+      ),
     );
   }
 

@@ -11,7 +11,7 @@ class Expense {
   factory Expense.fromMap(Map<String, dynamic> data) {
     return Expense(
       name: data['name'],
-      date: int.parse(data['date']),
+      date: data['date'],
       isMonthly: data['isMonthly'] == 1 ? true : false,
       place: data['place'],
       amount: double.parse(data['amount'].toString()),
@@ -26,7 +26,7 @@ class Expense {
     "isMonthly": isMonthly ? 1 : 0,
     "place": place,
     "amount": amount,
-    "type": type.toString().split(".")[1]
+    "type": type.toString().split(".")[1] //Remove the "Expensetype." from the enum
   };
 
 

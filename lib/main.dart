@@ -1,3 +1,4 @@
+import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
 import 'package:financetracker/CreateExpense.dart';
 import 'package:financetracker/CreateManager.dart';
@@ -50,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFF212128),
+        backgroundColor: mainPageBackgroundColor,
         body: Column(
           children: <Widget>[
             Overview(),
@@ -79,6 +80,19 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, snapshot) {
         if(snapshot.hasData) {
           return _builder(snapshot.data);
+        }
+        else if(snapshot.hasError) {
+          return Column(
+            children: [
+              Text(
+                "Error while retrieving data. [${snapshot.error}]",
+                style: TextStyle(fontSize: 22, color: Colors.white),
+              ),
+              Container(
+
+              ),
+            ],
+          );
         }
         else {
           return Column(
@@ -115,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment.centerLeft,
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardBackgroundColor,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             BoxShadow(
