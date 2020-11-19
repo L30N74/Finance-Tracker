@@ -60,7 +60,27 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Column(
           children: <Widget>[
             Overview(),
-            SizedBox(height: 30,),
+            Container(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      "Recent Expenses",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.filter_list, color: Colors.black, size: 30,),
+                    onPressed: () {
+
+                    },
+                  ),
+                ],
+              ),
+            ),
             ShowExpenses(),
           ],
         ),
