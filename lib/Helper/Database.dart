@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
 import 'package:financetracker/Classes/ExpenseGroup.dart';
+import 'package:financetracker/Classes/FilterSetting.dart';
 import 'package:financetracker/Classes/Manager.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:financetracker/main.dart';
+import 'package:financetracker/Classes/FilterSetting.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -160,8 +161,32 @@ class SQLiteDbProvider {
 
     int beginningDate = (new DateTime(date.year, date.month, 1)).millisecondsSinceEpoch;
     int endDate = (new DateTime(date.year, date.month+1, 0)).millisecondsSinceEpoch;
+    FilterSetting filter = MyHomePage.filterSetting;
+    String filterType = filter.filterType.toString().split(".")[1];
 
-    var result = await db.rawQuery("SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.date BETWEEN ? AND ? ORDER BY e.date DESC", [beginningDate, endDate]); //where: "date BETWEEN ? AND ? ORDER BY date DESC", whereArgs: [beginningDate, endDate]);
+
+    var query = "";
+    //Every expense
+    switch(filter.filterType){
+      case FilterType.Expense:
+      case FilterType.Income:
+        //Select only income or expenses but not both
+        String orderAscDesc = filter.isAscending ? "ASC" : "DESC";
+        query = "SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.type = '$filterType' AND e.date BETWEEN $beginningDate AND $endDate ORDER BY e.date $orderAscDesc";
+        break;
+      case FilterType.Group:
+        //Select groups
+        query = "SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.groupId = ${filter.group.id} AND e.date BETWEEN $beginningDate AND $endDate ORDER BY e.date DESC";
+        break;
+      case FilterType.Date:
+      default:
+        String orderAscDesc = filter.isAscending ? "ASC" : "DESC";
+        query = "SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.date BETWEEN $beginningDate AND $endDate ORDER BY e.date $orderAscDesc";
+        break;
+    }
+
+    var result = await db.rawQuery(query);
+
 
     List<Expense> expenses = new List<Expense>();
 

@@ -263,7 +263,11 @@ class _CreateExpenseState extends State<CreateExpense> {
             ),
           ),
         ),
-        FlatButton(
+        OutlineButton(
+          borderSide: BorderSide(
+            width: 2,
+            color: lightGreyColor,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
@@ -405,6 +409,7 @@ class _CreateExpenseState extends State<CreateExpense> {
     return Container(
       width: MediaQuery.of(context).size.width / 1.3,
       child: TextFormField(
+        style: basicStyle,
         decoration: InputDecoration(
           labelText: "Where did the expense take place?",
           labelStyle: basicStyle,
@@ -428,6 +433,7 @@ class _CreateExpenseState extends State<CreateExpense> {
     return Container(
       width: MediaQuery.of(context).size.width / 1.3,
       child: TextFormField(
+        style: basicStyle,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           labelText: "How much did the expense cost?",
@@ -492,10 +498,14 @@ class _CreateExpenseState extends State<CreateExpense> {
   }
 
   Widget SubmitButton() {
-    return FlatButton(
+    return OutlineButton(
       color: Colors.blue,
-      minWidth: MediaQuery.of(context).size.width / 1.3,
-      height: 60,
+      borderSide: BorderSide(
+        width: 2,
+        color: lightGreyColor,
+      ),
+      //minWidth: MediaQuery.of(context).size.width / 1.3,
+      //height: 60,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -512,7 +522,13 @@ class _CreateExpenseState extends State<CreateExpense> {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()));
         }
       },
-      child: Text("Submit"),
+      child: Padding(
+        padding: EdgeInsets.all(20),
+        child: Text(
+          "Submit",
+          style: TextStyle(color: Colors.white, fontSize: 32),
+        ),
+      ),
     );
   }
 }
