@@ -150,13 +150,28 @@ class _MyHomePageState extends State<MyHomePage> {
       future: SQLiteDbProvider.db.getExpenses(DateTime.now()),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          if (snapshot.data.length == 0)
+            return Container(
+              child: Text(
+                "No expenses yet or none found with the given filter.\nCreate an expense below or change filter-settings",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            );
+
           return _expenseListBuilder(snapshot.data);
         } else if (snapshot.hasError) {
           return Column(
             children: [
               Text(
                 "Error while retrieving data:\n [${snapshot.error}]",
-                style: TextStyle(fontSize: 16, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
               ),
             ],
           );
