@@ -32,7 +32,7 @@ class _CreateExpenseState extends State<CreateExpense> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: mainPageBackgroundColor,
+          backgroundColor: mainPageBackgroundColor,
           body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -45,37 +45,46 @@ class _CreateExpenseState extends State<CreateExpense> {
                     children: [
                       SizedBox(height: 20),
                       NameFormField(),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       DateFormField(),
                       RepeatCheckbox(),
-                      if(shouldRepeat) RepetitionField(),
+                      if (shouldRepeat) RepetitionField(),
                       GroupField(),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       PlaceFormField(),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       PriceFormField(),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            "Select a Type: ",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              "Select a Type: ",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                             ),
-                          ),
-                          ExpenseTypeDropdown(),
-                      ]),
-                      SizedBox(height: 20,),
+                            ExpenseTypeDropdown(),
+                          ]),
+                      SizedBox(
+                        height: 20,
+                      ),
                       SubmitButton(),
                     ],
                   ),
                 )
               ],
             ),
-          )
-      ),
+          )),
     );
   }
 
@@ -128,11 +137,11 @@ class _CreateExpenseState extends State<CreateExpense> {
           ),
           onPressed: () {
             showDatePicker(
-                context: context,
-                initialDate: now,
-                firstDate: new DateTime(now.year, now.month, 1),
-                lastDate: new DateTime(now.year, now.month+1, 0)
-            ).then((DateTime date) {
+                    context: context,
+                    initialDate: now,
+                    firstDate: new DateTime(now.year, now.month, 1),
+                    lastDate: new DateTime(now.year, now.month + 1, 0))
+                .then((DateTime date) {
               setState(() {
                 newExpense.date = date.millisecondsSinceEpoch;
               });
@@ -145,7 +154,11 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   Widget RepeatCheckbox() {
     return CheckboxListTile(
-      title: Text("Repeat", style: TextStyle(color: Colors.white), textAlign: TextAlign.right,),
+      title: Text(
+        "Repeat",
+        style: TextStyle(color: Colors.white),
+        textAlign: TextAlign.right,
+      ),
       value: shouldRepeat,
       onChanged: (bool value) {
         setState(() {
@@ -159,7 +172,12 @@ class _CreateExpenseState extends State<CreateExpense> {
     List<String> intervalAmountList = ["1", "2", "3", "4"];
     String intervalAmountValue = intervalAmountList[0];
 
-    List<String> intervalFactorList = ["day(s)", "week(s)", "month(s)", "year(s)"];
+    List<String> intervalFactorList = [
+      "day(s)",
+      "week(s)",
+      "month(s)",
+      "year(s)"
+    ];
     String intervalFactorValue = intervalFactorList[0];
 
     return Container(
@@ -167,7 +185,10 @@ class _CreateExpenseState extends State<CreateExpense> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Repeat every ", style: TextStyle(fontSize: 20, color: Colors.white),),
+          Text(
+            "Repeat every ",
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
           Container(
             width: 80,
             child: Theme(
@@ -175,30 +196,29 @@ class _CreateExpenseState extends State<CreateExpense> {
                 canvasColor: mediumDarkGreyColor,
               ),
               child: DropdownButtonFormField(
-                value: intervalAmountValue,
-                onSaved: (value) => {
-                  if(shouldRepeat) {
-                    //TODO: Set up flexible expense-repeptition
-                    print(value)
-                  }
-                },
-                onChanged: (value) => {
-                  setState(() {
-                    intervalFactorValue = value;
-                  })
-                },
-                items: intervalAmountList.map((e) {
-                  return DropdownMenuItem(
-                    value: e,
-                    child:
-                    Text(
-                      e,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }).toList()
-              ),
+                  value: intervalAmountValue,
+                  onSaved: (value) => {
+                        if (shouldRepeat)
+                          {
+                            //TODO: Set up flexible expense-repeptition
+                            print(value)
+                          }
+                      },
+                  onChanged: (value) => {
+                        setState(() {
+                          intervalFactorValue = value;
+                        })
+                      },
+                  items: intervalAmountList.map((e) {
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }).toList()),
             ),
           ),
           Container(
@@ -208,30 +228,29 @@ class _CreateExpenseState extends State<CreateExpense> {
                 canvasColor: mainPageBackgroundColor,
               ),
               child: DropdownButtonFormField(
-                value: intervalFactorValue,
-                onSaved: (value) => {
-                  if(shouldRepeat) {
-                    //TODO: Set up flexible expense-repeptition
-                    print(value)
-                  }
-                },
-                onChanged: (value) => {
-                  setState(() {
-                    intervalFactorValue = value;
-                  })
-                },
-                items: intervalFactorList.map((e) {
-                  return DropdownMenuItem(
-                    value: e,
-                    child:
-                      Text(
+                  value: intervalFactorValue,
+                  onSaved: (value) => {
+                        if (shouldRepeat)
+                          {
+                            //TODO: Set up flexible expense-repeptition
+                            print(value)
+                          }
+                      },
+                  onChanged: (value) => {
+                        setState(() {
+                          intervalFactorValue = value;
+                        })
+                      },
+                  items: intervalFactorList.map((e) {
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(
                         e,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
-                  );
-                }).toList()
-              ),
+                    );
+                  }).toList()),
             ),
           ),
         ],
@@ -258,25 +277,25 @@ class _CreateExpenseState extends State<CreateExpense> {
             child: DropdownButtonHideUnderline(
               child: FutureBuilder<List<ExpenseGroup>>(
                 future: SQLiteDbProvider.db.getAllGroups(),
-                builder: (context, snapshot) => _groupDrowdownBuilder(context, snapshot),
+                builder: (context, snapshot) =>
+                    _groupDrowdownBuilder(context, snapshot),
               ),
             ),
           ),
         ),
         OutlineButton(
-          borderSide: BorderSide(
-            width: 2,
-            color: lightGreyColor,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Text(
-            "Create Group",
-            style: TextStyle(color: Colors.white),
-          ),
-          onPressed: () => _colorPickerPopup()
-        ),
+            borderSide: BorderSide(
+              width: 2,
+              color: lightGreyColor,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Text(
+              "Create Group",
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () => _colorPickerPopup()),
       ],
     );
   }
@@ -286,10 +305,9 @@ class _CreateExpenseState extends State<CreateExpense> {
     List<DropdownMenuItem> list = new List<DropdownMenuItem>();
     int _selectedItem = 0;
 
-    if(snapshot.hasError){
+    if (snapshot.hasError) {
       return new Container();
-    }
-    else if(snapshot.hasData) {
+    } else if (snapshot.hasData) {
       dropDownItemsMap = new Map();
       list.clear();
 
@@ -313,8 +331,7 @@ class _CreateExpenseState extends State<CreateExpense> {
         },
         hint: _groupContainer(newExpense.group),
       );
-    }
-    else {
+    } else {
       return CircularProgressIndicator();
     }
   }
@@ -324,7 +341,10 @@ class _CreateExpenseState extends State<CreateExpense> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Create a new Group", textAlign: TextAlign.center,),
+            title: Text(
+              "Create a new Group",
+              textAlign: TextAlign.center,
+            ),
             content: SingleChildScrollView(
               child: Form(
                 key: _colorFormKey,
@@ -336,7 +356,9 @@ class _CreateExpenseState extends State<CreateExpense> {
                         labelStyle: TextStyle(),
                       ),
                       validator: (String value) {
-                        return value.length == 0 ? "Please enter something" : null;
+                        return value.length == 0
+                            ? "Please enter something"
+                            : null;
                       },
                       onSaved: (String value) => {
                         newExpense.group.name = value,
@@ -349,28 +371,35 @@ class _CreateExpenseState extends State<CreateExpense> {
                           setState(() {
                             pickerColor = color;
                           });
-                        }
+                        }),
+                    SizedBox(
+                      height: 10,
                     ),
-                    SizedBox(height: 10,),
                     FlatButton(
                       height: 50,
                       minWidth: 200,
-                      child: Text("Done", style: TextStyle(fontSize: 20),),
+                      child: Text(
+                        "Done",
+                        style: TextStyle(fontSize: 20),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
                       color: Colors.blue,
                       onPressed: () {
-                        if(_colorFormKey.currentState.validate()) {
+                        if (_colorFormKey.currentState.validate()) {
                           _colorFormKey.currentState.save();
 
                           setState(() => {
-                            currentColor = pickerColor,
-                            newExpense.group.setColor(pickerColor),
+                                currentColor = pickerColor,
+                                newExpense.group.setColor(pickerColor),
 
-                            //Notify database
-                            SQLiteDbProvider.db.insertNewGroup(newExpense.group).then((value) => newExpense.group.id = value),
-                          });
+                                //Notify database
+                                SQLiteDbProvider.db
+                                    .insertNewGroup(newExpense.group)
+                                    .then(
+                                        (value) => newExpense.group.id = value),
+                              });
                           Navigator.of(context).pop();
                         }
                       },
@@ -380,18 +409,15 @@ class _CreateExpenseState extends State<CreateExpense> {
               ),
             ),
           );
-        }
-    );
+        });
   }
 
   Widget _groupContainer(ExpenseGroup group) {
     return Container(
-      //margin: EdgeInsets.symmetric(horizontal: 10),
       height: 25,
       width: 100,
       decoration: BoxDecoration(
-        //borderRadius: BorderRadius.all(Radius.circular(20)),
-        color: group.getColor(), //expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
+        color: group.getColor(),
       ),
       child: Center(
         child: Text(
@@ -447,11 +473,11 @@ class _CreateExpenseState extends State<CreateExpense> {
           ),
         ),
         validator: (String value) {
-          return double.tryParse(value) == null ? "Please enter a valid number" : null;
+          return double.tryParse(value) == null
+              ? "Please enter a valid number"
+              : null;
         },
-        onSaved: (String value) => {
-          newExpense.amount = double.parse(value)
-        },
+        onSaved: (String value) => {newExpense.amount = double.parse(value)},
       ),
     );
   }
@@ -464,35 +490,37 @@ class _CreateExpenseState extends State<CreateExpense> {
           canvasColor: mediumDarkGreyColor,
         ),
         child: DropdownButtonFormField(
-          value: ExpenseType.Expense.toString().split(".")[1],
-          onSaved: (String value) => {
-            if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
-              newExpense.type = ExpenseType.Expense
-            else
-              newExpense.type = ExpenseType.Income
-          },
-          onChanged: (String value) => {
-            setState(() {
-              if(value.compareTo(ExpenseType.Expense.toString().split(".")[1]) == 0)
-                newExpense.type = ExpenseType.Expense;
-              else
-                newExpense.type = ExpenseType.Income;
-            })
-          },
-          items: ExpenseType.values.map((e) {
-            String type = e.toString().split(".")[1];
+            value: ExpenseType.Expense.toString().split(".")[1],
+            onSaved: (String value) => {
+                  if (value.compareTo(
+                          ExpenseType.Expense.toString().split(".")[1]) ==
+                      0)
+                    newExpense.type = ExpenseType.Expense
+                  else
+                    newExpense.type = ExpenseType.Income
+                },
+            onChanged: (String value) => {
+                  setState(() {
+                    if (value.compareTo(
+                            ExpenseType.Expense.toString().split(".")[1]) ==
+                        0)
+                      newExpense.type = ExpenseType.Expense;
+                    else
+                      newExpense.type = ExpenseType.Income;
+                  })
+                },
+            items: ExpenseType.values.map((e) {
+              String type = e.toString().split(".")[1];
 
-            return DropdownMenuItem(
-              value: type,
-              child:
-                Text(
+              return DropdownMenuItem(
+                value: type,
+                child: Text(
                   type,
                   style: TextStyle(fontSize: 16, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
-            );
-          }).toList()
-        ),
+              );
+            }).toList()),
       ),
     );
   }
@@ -510,7 +538,7 @@ class _CreateExpenseState extends State<CreateExpense> {
         borderRadius: BorderRadius.circular(25),
       ),
       onPressed: () {
-        if(_mainFormKey.currentState.validate()) {
+        if (_mainFormKey.currentState.validate()) {
           _mainFormKey.currentState.save();
 
           //Save Expense in database
@@ -519,7 +547,8 @@ class _CreateExpenseState extends State<CreateExpense> {
           //Calculate new money pools (spent money and remaining money)
           MyHomePage.manager.HandleExpense(newExpense);
 
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => MyHomePage()));
         }
       },
       child: Padding(
@@ -532,4 +561,3 @@ class _CreateExpenseState extends State<CreateExpense> {
     );
   }
 }
-

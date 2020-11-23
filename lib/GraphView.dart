@@ -1,4 +1,5 @@
 import 'package:financetracker/Classes/Constants.dart';
+import 'package:financetracker/Classes/ExpenseGroup.dart';
 import 'package:financetracker/Classes/Manager.dart';
 import 'package:financetracker/Helper/Database.dart';
 import 'package:financetracker/main.dart';
@@ -26,13 +27,14 @@ class _GraphViewState extends State<GraphView> {
             filterContainer(),
             graphContainer(),
             SizedBox(
-              height: 30,
+              height: 10,
             ),
             detailsView(),
-            SizedBox(
-              height: 30,
-            ),
+            Spacer(),
             returnButton(),
+            SizedBox(
+              height: 20,
+            ),
           ],
         ),
       ),
@@ -47,7 +49,7 @@ class _GraphViewState extends State<GraphView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Show up to how many?",
+            "Show up to how many entries?",
             style: TextStyle(
               fontSize: 16,
               color: Colors.white,
@@ -227,7 +229,7 @@ class _GraphViewState extends State<GraphView> {
           Container(
             width: 15,
             height: 15,
-            color: Colors.blue,
+            color: Colors.red,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 5.0),
@@ -235,7 +237,7 @@ class _GraphViewState extends State<GraphView> {
               "Spent",
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.red,
+                color: Colors.black,
               ),
             ),
           ),
@@ -264,26 +266,97 @@ class _GraphViewState extends State<GraphView> {
 
   Widget detailsView() {
     if (selectedEntry == null) return Container();
-
     final Manager selectedManager = selectedEntry.selectedDatum.first.datum;
 
     return Container(
+      height: 250,
+      margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "You started this month with ${selectedManager.startingMoney}",
-            style: graphDetailsTextStyle,
+            "Money spent on in ${selectedManager.month}:",
+            style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                decoration: TextDecoration.underline),
+            textAlign: TextAlign.center,
           ),
-          Text(
-            "You spent ${selectedManager.spentMoney} Euros",
-            style: graphDetailsTextStyle,
+          SizedBox(
+            height: 15,
           ),
-          Text(
-            "You saved ${selectedManager.remainingMoney} Euros",
-            style: graphDetailsTextStyle,
+          groupExpenseOverview(selectedManager),
+          SizedBox(
+            height: 20,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "You started the month with ${selectedManager.startingMoney.toString()}€",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              Text(
+                "Total expenses: ${selectedManager.spentMoney.toString()}€",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              Text(
+                "Total saved: ${selectedManager.remainingMoney.toString()}€",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget groupExpenseOverview(Manager selectedManager) {
+    return Expanded(
+      child: FutureBuilder(
+        future: SQLiteDbProvider.db.getExpensesFromGroups(selectedManager),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Container();
+          if (snapshot.hasData) {
+            Map<ExpenseGroup, double> expenses = snapshot.data;
+            List<MapEntry<ExpenseGroup, double>> list =
+                expenses.entries.toList();
+
+            return ListView.builder(
+              itemCount: expenses.length,
+              itemBuilder: (context, index) {
+                ExpenseGroup group = list[index].key;
+                double spentAmount = list[index].value;
+
+                return Container(
+                  margin: EdgeInsets.only(
+                    bottom: 15,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 50,
+                        margin: EdgeInsets.only(right: 10),
+                        color: group.getColor(),
+                      ),
+                      Text(
+                        group.name,
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      Spacer(),
+                      Text(
+                        spentAmount.toString() + "€",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+          return CircularProgressIndicator();
+        },
       ),
     );
   }

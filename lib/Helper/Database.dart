@@ -27,7 +27,9 @@ class SQLiteDbProvider {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "Expenses.db");
 
-    return await openDatabase(path, version: 1, onOpen: (db) {},
+    return await openDatabase(path, version: 1, onOpen: (db) {
+      print("Opening database");
+    },
         onCreate: (Database db, int version) async {
       await setUpTables();
     });
@@ -89,8 +91,8 @@ class SQLiteDbProvider {
 
   resetGroupsTable() async {
     final db = await database;
-    await db.delete("Expensegroup",
-        where: "ROWID > ?", whereArgs: [defaultExpenseGroups.length]);
+    await db.delete("Expensegroup");
+    //where: "ROWID > ?", whereArgs: [defaultExpenseGroups.length]);
     print("INFO [Groups reset]");
   }
 
@@ -100,14 +102,22 @@ class SQLiteDbProvider {
   Future<Manager> getCurrentManager() async {
     final db = await database;
 
+    var res = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name = Manager;");
+    var iterator = res.iterator;
+    iterator.moveNext();
+    if(iterator.current.length < 1) {
+      print("No Table called 'Manager'");
+      setUpTables();
+    }
+
+    print("Manager table exists");
     //Get the date the manager should be assigned to if he exists
     DateTime now = DateTime.now();
     String beginningDate =
         DateFormat.yM().format(new DateTime(now.year, now.month, 1));
 
     //Retrieve manager of this month
-    var result = await db
-        .query("Manager", where: "month = ?", whereArgs: [beginningDate]);
+    var result = await db.query("Manager", where: "month = ?", whereArgs: [beginningDate]);
 
     return result.isNotEmpty ? Manager.fromMap(result.first) : null;
   }
@@ -196,6 +206,52 @@ class SQLiteDbProvider {
     while (iterator.moveNext()) expenses.add(Expense.fromMap(iterator.current));
 
     return expenses;
+  }
+
+  Future<Map<ExpenseGroup, double>> getExpensesFromGroups(
+      Manager manager) async {
+    final db = await database;
+    Map<ExpenseGroup, double> expensesMap = new Map();
+
+    var dateSplits = manager.month.split("/");
+    int month = int.parse(dateSplits[0]);
+    int year = int.parse(dateSplits[1]);
+
+    int beginningDate = (new DateTime(year, month, 1)).millisecondsSinceEpoch;
+    int endDate = (new DateTime(year, month + 1, 0)).millisecondsSinceEpoch;
+
+    // Retrieve all groups
+    var groups = await db.query("Expensegroup");
+    var groupIterator = groups.iterator;
+
+    while (groupIterator.moveNext()) {
+      var group = ExpenseGroup.fromMap(groupIterator.current);
+
+      // Get all expenses by those groups
+      // Add up the expenses
+      String query =
+          "SELECT sum(e.amount) FROM Expenses e JOIN ExpenseGroup g " +
+              "ON e.groupId = g.ROWID AND g.groupName = ? AND " +
+              "e.date BETWEEN ? AND ?;";
+
+      var result =
+          await db.rawQuery(query, [group.name, beginningDate, endDate]);
+
+      //Value is in a cursor. Retrieve and parse to double
+      var resultIterator = result.iterator;
+      resultIterator.moveNext();
+      double parseAmount =
+          double.tryParse(resultIterator.current.values.first.toString());
+
+      // If there are no expenses in a group, null is returned from tryparse.
+      // Get rid of that so there is always a double
+      double amount = parseAmount != null ? parseAmount : 0.0;
+
+      // Put the total into the map
+      if (amount != null) expensesMap[group] = amount;
+    }
+
+    return expensesMap;
   }
 
   insertNewGroup(ExpenseGroup group) async {

@@ -67,36 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Column(
           children: <Widget>[
             Overview(),
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text(
-                      "Recent Expenses",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.filter_list,
-                      color: Colors.black,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      //OpenFilterDialog();
-                      DialogHelper.showFilterDialog(context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            ShowExpenses(),
+            middleRow(),
+            showExpenses(),
           ],
         ),
-        bottomNavigationBar: MyBottomBar(),
+        bottomNavigationBar: myBottomBar(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Container(
           width: 60,
@@ -115,7 +90,36 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget ShowExpenses() {
+  Widget middleRow() {
+    return Container(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: Text(
+              "Recent Expenses",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.filter_list,
+              color: Colors.black,
+              size: 30,
+            ),
+            onPressed: () {
+              //OpenFilterDialog();
+              DialogHelper.showFilterDialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget showExpenses() {
     return FutureBuilder(
       future: SQLiteDbProvider.db.getExpenses(DateTime.now()),
       builder: (context, snapshot) {
@@ -160,11 +164,11 @@ class _MyHomePageState extends State<MyHomePage> {
           //padding: const EdgeInsets.only(top: 0, bottom: 100),
           itemCount: list.length,
           itemBuilder: (BuildContext context, int index) =>
-              CreateExpenseItem(list[index])),
+              createExpenseItem(list[index])),
     );
   }
 
-  Widget CreateExpenseItem(expense) {
+  Widget createExpenseItem(expense) {
     return Container(
       height: 100,
       alignment: Alignment.centerLeft,
@@ -254,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget MyBottomBar() {
+  Widget myBottomBar() {
     return BottomAppBar(
       color: Colors.white, //Color(0xFF216128),
       shape: CircularNotchedRectangle(),
@@ -273,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             MaterialButton(
-              child: Text("Reset Groups"),
+              child: Text("Debug Print"),
               onPressed: () {
                 setState(() {
                   SQLiteDbProvider.db.resetGroupsTable();
@@ -283,9 +287,8 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialButton(
               child: Text("Reset Database"),
               onPressed: () {
-                setState(() {
-                  SQLiteDbProvider.db.setUpTables();
-                });
+                SQLiteDbProvider.db.setUpTables();
+                setState(() {});
               },
             ),
           ],
@@ -294,54 +297,60 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future CreateManagerAlert(BuildContext context) {
+  Future createManagerAlert(BuildContext context) {
     TextEditingController controller = TextEditingController();
 
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Monthly Setup"),
-            content: Container(
-              height: 200,
-              child: Column(
-                children: [
-                  Text("How much money is at your disposal this month?"),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  TextField(
-                    controller: controller,
-                    keyboardType: TextInputType.number,
-                    onSubmitted: (String value) async {
-                      MyHomePage.manager = await SQLiteDbProvider.db
-                          .insertNewManager(
-                              double.parse(value),
-                              DateFormat.yM().format(new DateTime(
-                                  DateTime.now().year,
-                                  DateTime.now().month,
-                                  1)));
-                    },
-                  ),
-                  FlatButton(
-                      child: Text("Submit"),
-                      onPressed: () => {
-                            SQLiteDbProvider.db
-                                .insertNewManager(
-                                    double.parse(controller.value.text),
-                                    DateFormat.yM().format(new DateTime(
-                                        DateTime.now().year,
-                                        DateTime.now().month,
-                                        1)))
-                                .then((mgr) => {
-                                      MyHomePage.manager = mgr,
-                                      Navigator.of(context).pop()
-                                    })
-                          }),
-                ],
-              ),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Monthly Setup"),
+          content: Container(
+            height: 200,
+            child: Column(
+              children: [
+                Text("How much money is at your disposal this month?"),
+                SizedBox(
+                  height: 50,
+                ),
+                TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  onSubmitted: (String value) async {
+                    MyHomePage.manager =
+                        await SQLiteDbProvider.db.insertNewManager(
+                      double.parse(value),
+                      DateFormat.yM().format(
+                        new DateTime(
+                            DateTime.now().year, DateTime.now().month, 1),
+                      ),
+                    );
+                  },
+                ),
+                FlatButton(
+                  child: Text("Submit"),
+                  onPressed: () => {
+                    SQLiteDbProvider.db
+                        .insertNewManager(
+                          double.parse(controller.value.text),
+                          DateFormat.yM().format(
+                            new DateTime(
+                                DateTime.now().year, DateTime.now().month, 1),
+                          ),
+                        )
+                        .then(
+                          (mgr) => {
+                            MyHomePage.manager = mgr,
+                            Navigator.of(context).pop()
+                          },
+                        ),
+                  },
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

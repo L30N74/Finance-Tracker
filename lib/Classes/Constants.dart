@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 List<ExpenseGroup> defaultExpenseGroups = [
   new ExpenseGroup(name: "Default", color: formatColor(Colors.red.toString())),
-  new ExpenseGroup(name: "Food", color: formatColor(Colors.green.toString())),
+  new ExpenseGroup(name: "Hobby", color: formatColor(Colors.green.toString())),
 ];
 
 Color mainPageBackgroundColor = Color(0xFF212128);
@@ -20,6 +20,7 @@ TextStyle errorTextStyle = new TextStyle(fontSize: 12, color: Colors.red);
 TextStyle graphDetailsTextStyle =
     new TextStyle(fontSize: 20, color: Colors.white);
 
+/// Returns the hexcode of a color as a string
 String formatColor(String color) {
   String colorWork = (color.length > 18)
       ? color.substring(35).split(")")[0]
