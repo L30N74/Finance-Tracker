@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CreateManager extends StatelessWidget {
-  TextEditingController controller = TextEditingController();
-
-  DateTime now = DateTime.now();
+  final TextEditingController controller = TextEditingController();
+  final DateTime now = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,11 @@ class CreateManager extends StatelessWidget {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("How much money is at your disposal this month?", style: TextStyle(), textAlign: TextAlign.center,),
+            Text(
+              "How much money is at your disposal this month?",
+              style: TextStyle(),
+              textAlign: TextAlign.center,
+            ),
             Container(
               width: 200,
               child: TextField(
@@ -30,17 +33,22 @@ class CreateManager extends StatelessWidget {
             ),
             //Text("€", style: TextStyle(fontSize: 22),),
             RaisedButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text("Submit"),
-              onPressed: () => {
-                SQLiteDbProvider.db.insertNewManager(double.parse(controller.value.text), DateFormat.yM().format(new DateTime(now.year, now.month, 1))).then((mgr) => {
-                  MyHomePage.manager = mgr,
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyHomePage()))
-                })
-              }
-            ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text("Submit"),
+                onPressed: () => {
+                      SQLiteDbProvider.db
+                          .insertNewManager(
+                              double.parse(controller.value.text),
+                              DateFormat.yM()
+                                  .format(new DateTime(now.year, now.month, 1)))
+                          .then((mgr) => {
+                                MyHomePage.manager = mgr,
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => MyHomePage()))
+                              })
+                    }),
           ],
         ),
       ),

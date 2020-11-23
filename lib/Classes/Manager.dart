@@ -31,7 +31,7 @@ class Manager {
   /// In case that the [expense]'s ExpenseType is of Type Expense, [spentMoney] will be increased by the [expense]'s amount
   /// I don't want to decrease spent money when receiving some.
   /// Remaining money will get updated in both cases.
-  void HandleExpense(Expense expense) {
+  void handleExpense(Expense expense) {
     if (expense.type == ExpenseType.Expense) {
       spentMoney += expense.amount;
       remainingMoney -= expense.amount;

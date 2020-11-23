@@ -43,20 +43,25 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    SQLiteDbProvider.db.getCurrentManager().then((mgr) => {
-          if (mgr == null)
-            {
-              // Redirect user to page to create a new manager
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => CreateManager()))
-            }
-          else
-            {
-              //There already exists a manager for this month. Retrieve data
-              MyHomePage.manager = mgr,
-              //setState(() {})
-            }
-        });
+    if (MyHomePage.manager == null) {
+      SQLiteDbProvider.db.getCurrentManager().then(
+            (mgr) => {
+              if (mgr == null)
+                {
+                  // Redirect user to page to create a new manager
+                  print("No manager found. Redirecting."),
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => CreateManager()))
+                }
+              else
+                {
+                  //There already exists a manager for this month. Retrieve data
+                  print("Manager found."),
+                  MyHomePage.manager = mgr,
+                }
+            },
+          );
+    }
   }
 
   @override
@@ -88,6 +93,23 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+
+    /*return SafeArea(
+      child: Scaffold(
+        backgroundColor: mainPageBackgroundColor,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: 200,
+              width: 200,
+              child: CircularProgressIndicator(),
+            ),
+          ],
+        ),
+      ),
+    );*/
   }
 
   Widget middleRow() {
@@ -282,13 +304,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   SQLiteDbProvider.db.resetGroupsTable();
                 });
-              },
-            ),
-            MaterialButton(
-              child: Text("Reset Database"),
-              onPressed: () {
-                SQLiteDbProvider.db.setUpTables();
-                setState(() {});
               },
             ),
           ],

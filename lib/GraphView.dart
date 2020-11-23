@@ -44,8 +44,9 @@ class _GraphViewState extends State<GraphView> {
   Widget filterContainer() {
     return Container(
       padding: EdgeInsets.only(left: 20, right: 50),
+      margin: EdgeInsets.only(top: 20),
       height: 100,
-      child: Row(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
@@ -269,7 +270,7 @@ class _GraphViewState extends State<GraphView> {
     final Manager selectedManager = selectedEntry.selectedDatum.first.datum;
 
     return Container(
-      height: 250,
+      height: 200,
       margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
       child: Column(
         children: [

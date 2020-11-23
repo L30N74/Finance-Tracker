@@ -27,54 +27,61 @@ class SQLiteDbProvider {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "Expenses.db");
 
-    return await openDatabase(path, version: 1, onOpen: (db) {
-      print("Opening database");
-    },
-        onCreate: (Database db, int version) async {
-      await setUpTables();
-    });
-  }
+    return await openDatabase(
+      path,
+      version: 1,
+      onOpen: (db) {
+        print("Opening database");
 
-  setUpTables() async {
-    var db = await database;
-    await db.execute("DROP TABLE IF EXISTS Manager;");
-    await db.execute("DROP TABLE IF EXISTS Expensegroup;");
-    await db.execute("DROP TABLE IF EXISTS Expenses;");
+        print(db.isOpen);
+      },
+      onCreate: (Database db, int version) async {
+        await db.execute("DROP TABLE IF EXISTS Manager;");
+        await db.execute("DROP TABLE IF EXISTS Expensegroup;");
+        await db.execute("DROP TABLE IF EXISTS Expenses;");
 
-    await db.execute("CREATE TABLE Manager("
-        "starting_money TEXT,"
-        "spent_money TEXT DEFAULT 0.0,"
-        "remaining_money TEXT,"
-        "month TEXT"
-        ");");
+        print("initializing Manager table.");
 
-    print("Manager table initialized.");
+        db.execute("CREATE TABLE Manager("
+            "starting_money TEXT,"
+            "spent_money TEXT DEFAULT 0.0,"
+            "remaining_money TEXT,"
+            "month TEXT"
+            ");");
 
-    await db.execute("CREATE TABLE Expensegroup("
-        "ROWID INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "groupName TEXT,"
-        "color TEXT"
-        ");");
+        print("Manager table initialized.");
 
-    //Set up default groups
-    defaultExpenseGroups.forEach((element) async {
-      await insertNewGroup(element);
-    });
+        print("initializing Expensegroup table.");
 
-    print("Expensegroup table initialized.");
+        db.execute("CREATE TABLE Expensegroup("
+            "ROWID INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "groupName TEXT,"
+            "color TEXT"
+            ");");
 
-    await db.execute("CREATE TABLE Expenses("
-        "name TEXT,"
-        "date INTEGER,"
-        "place TEXT,"
-        "amount NUMBER,"
-        "type TEXT,"
-        "isMonthly NUMBER,"
-        "groupId NUMBER,"
-        "FOREIGN KEY(groupId) REFERENCES Expensegroup(ROWID)"
-        ");");
+        //Set up default groups
+        defaultExpenseGroups.forEach((element) async {
+          await insertNewGroup(element);
+        });
 
-    print("Expenses table initialized.");
+        print("Expensegroup table initialized.");
+
+        print("initializing Expenses table.");
+
+        db.execute("CREATE TABLE Expenses("
+            "name TEXT,"
+            "date INTEGER,"
+            "place TEXT,"
+            "amount NUMBER,"
+            "type TEXT,"
+            "isMonthly NUMBER,"
+            "groupId NUMBER,"
+            "FOREIGN KEY(groupId) REFERENCES Expensegroup(ROWID)"
+            ");");
+
+        print("Expenses table initialized.");
+      },
+    );
   }
 
   resetManagerTable() async {
@@ -102,22 +109,14 @@ class SQLiteDbProvider {
   Future<Manager> getCurrentManager() async {
     final db = await database;
 
-    var res = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name = Manager;");
-    var iterator = res.iterator;
-    iterator.moveNext();
-    if(iterator.current.length < 1) {
-      print("No Table called 'Manager'");
-      setUpTables();
-    }
-
-    print("Manager table exists");
     //Get the date the manager should be assigned to if he exists
     DateTime now = DateTime.now();
     String beginningDate =
         DateFormat.yM().format(new DateTime(now.year, now.month, 1));
 
     //Retrieve manager of this month
-    var result = await db.query("Manager", where: "month = ?", whereArgs: [beginningDate]);
+    var result = await db
+        .query("Manager", where: "month = ?", whereArgs: [beginningDate]);
 
     return result.isNotEmpty ? Manager.fromMap(result.first) : null;
   }
