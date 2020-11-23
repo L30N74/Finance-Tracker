@@ -256,20 +256,6 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
         ),
       ),
     );
-
-    /*return FlatButton(
-      color: Colors.blue,
-      height: 40,
-      minWidth: 200,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      onPressed: () => _buttonOnPress(),
-      child: Text(
-        "Confirm",
-        style: TextStyle(fontSize: 16, color: Colors.white),
-      ),
-    );*/
   }
 
   _buttonOnPress() {

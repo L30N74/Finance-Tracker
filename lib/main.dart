@@ -49,14 +49,12 @@ class _MyHomePageState extends State<MyHomePage> {
               if (mgr == null)
                 {
                   // Redirect user to page to create a new manager
-                  print("No manager found. Redirecting."),
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => CreateManager()))
                 }
               else
                 {
                   //There already exists a manager for this month. Retrieve data
-                  print("Manager found."),
                   MyHomePage.manager = mgr,
                 }
             },
@@ -81,22 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: Container(
           width: 60,
           height: 60,
-          child: myFLoatingActionButton(),
-          /*FloatingActionButton(
-            backgroundColor: Colors.blue,
-            child: Icon(
-              Icons.add,
-              size: 28,
-            ),
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => CreateExpense())),
-          ),*/
+          child: myFloatingActionButton(),
         ),
       ),
     );
   }
 
-  Widget myFLoatingActionButton() {
+  Widget myFloatingActionButton() {
     return Container(
       width: 200,
       height: 40,
@@ -135,16 +124,21 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(color: Colors.white),
             ),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.filter_list,
-              color: Colors.black,
-              size: 30,
+          Container(
+            margin: EdgeInsets.only(
+              right: 20,
             ),
-            onPressed: () {
-              //OpenFilterDialog();
-              DialogHelper.showFilterDialog(context);
-            },
+            child: IconButton(
+              icon: Icon(
+                Icons.filter_list,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                //OpenFilterDialog();
+                DialogHelper.showFilterDialog(context);
+              },
+            ),
           ),
         ],
       ),
@@ -299,24 +293,39 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            MaterialButton(
-              child: Text("View graph"),
-              onPressed: () {
-                setState(() {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => GraphView()));
-                });
-              },
+            graphRedirectButton(),
+            SizedBox(
+              width: 100,
             ),
-            MaterialButton(
-              child: Text("Debug Print"),
-              onPressed: () {
-                setState(() {
-                  SQLiteDbProvider.db.resetGroupsTable();
-                });
-              },
+            SizedBox(
+              width: 100,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget graphRedirectButton() {
+    return Container(
+      width: MediaQuery.of(context).size.width / 3.5,
+      child: OutlineButton(
+        color: Colors.blue,
+        borderSide: BorderSide(
+          width: 2,
+          color: lightGreyColor,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => GraphView())),
+        child: Text(
+          "View graph",
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+          ),
         ),
       ),
     );
