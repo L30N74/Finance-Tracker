@@ -81,7 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: Container(
           width: 60,
           height: 60,
-          child: FloatingActionButton(
+          child: myFLoatingActionButton(),
+          /*FloatingActionButton(
             backgroundColor: Colors.blue,
             child: Icon(
               Icons.add,
@@ -89,27 +90,36 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) => CreateExpense())),
+          ),*/
+        ),
+      ),
+    );
+  }
+
+  Widget myFLoatingActionButton() {
+    return Container(
+      width: 200,
+      height: 40,
+      child: OutlineButton(
+        color: Colors.blue,
+        borderSide: BorderSide(
+          width: 2,
+          color: lightGreyColor,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => CreateExpense())),
+        child: Text(
+          "+",
+          style: TextStyle(
+            fontSize: 32,
+            color: Colors.white,
           ),
         ),
       ),
     );
-
-    /*return SafeArea(
-      child: Scaffold(
-        backgroundColor: mainPageBackgroundColor,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              height: 200,
-              width: 200,
-              child: CircularProgressIndicator(),
-            ),
-          ],
-        ),
-      ),
-    );*/
   }
 
   Widget middleRow() {

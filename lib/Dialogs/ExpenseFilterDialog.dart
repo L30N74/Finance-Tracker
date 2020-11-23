@@ -6,13 +6,11 @@ import 'package:financetracker/main.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseFilterDialog extends StatefulWidget {
-
   @override
   _ExpenseFilterDialogState createState() => _ExpenseFilterDialogState();
 }
 
 class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
-
   List<String> filterOptions = ["Expenses", "Income", "Date", "Group"];
   String selectedType = "Expenses";
   String selectedOrderType = "Ascending";
@@ -45,10 +43,12 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _typeChoice(),
-          if(filterByAscDesc) _orderDropdown(),
-          if(filterByGroup) _listGroupDropdown(),
+          if (filterByAscDesc) _orderDropdown(),
+          if (filterByGroup) _listGroupDropdown(),
           _submitButton(),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
         ],
       ),
     );
@@ -60,14 +60,16 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
       height: 100,
       decoration: BoxDecoration(
         color: lightGreyColor,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20), topRight: Radius.circular(20)),
       ),
       child: Container(
         width: double.infinity,
         height: 80,
         decoration: BoxDecoration(
           color: darkGreyColor,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -89,7 +91,7 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
                   setState(() {
                     selectedType = value;
 
-                    switch(value) {
+                    switch (value) {
                       case "Expenses":
                         filterByExpenses = true;
                         filterByAscDesc = true;
@@ -121,15 +123,14 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
                     }
                   });
                 },
-                items: filterOptions.map((entry) => DropdownMenuItem(
-                    value: entry,
-                    child: Text(
-                      entry,
-                      style: TextStyle(
-                          color: Colors.white
-                      ),
-                    )
-                )).toList(),
+                items: filterOptions
+                    .map((entry) => DropdownMenuItem(
+                        value: entry,
+                        child: Text(
+                          entry,
+                          style: TextStyle(color: Colors.white),
+                        )))
+                    .toList(),
               ),
             ),
           ],
@@ -150,15 +151,14 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
             selectedOrderType = value;
           });
         },
-        items: ["Ascending", "Descending"].map((entry) => DropdownMenuItem(
-            value: entry,
-            child: Text(
-              entry,
-              style: TextStyle(
-                  color: Colors.white
-              ),
-            )
-        )).toList(),
+        items: ["Ascending", "Descending"]
+            .map((entry) => DropdownMenuItem(
+                value: entry,
+                child: Text(
+                  entry,
+                  style: TextStyle(color: Colors.white),
+                )))
+            .toList(),
       ),
     );
   }
@@ -171,7 +171,8 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
       child: DropdownButtonHideUnderline(
         child: FutureBuilder<List<ExpenseGroup>>(
           future: SQLiteDbProvider.db.getAllGroups(),
-          builder: (context, snapshot) => _groupDropdownBuilder(context, snapshot),
+          builder: (context, snapshot) =>
+              _groupDropdownBuilder(context, snapshot),
         ),
       ),
     );
@@ -182,10 +183,9 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
     List<DropdownMenuItem> list = new List<DropdownMenuItem>();
     int _selectedItem = 0;
 
-    if(snapshot.hasError){
+    if (snapshot.hasError) {
       return new Container();
-    }
-    else if(snapshot.hasData) {
+    } else if (snapshot.hasData) {
       dropDownItemsMap = new Map();
       list.clear();
 
@@ -209,8 +209,7 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
         },
         hint: _groupContainer(selectedGroup),
       );
-    }
-    else {
+    } else {
       return CircularProgressIndicator();
     }
   }
@@ -222,7 +221,8 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
       width: 200,
       decoration: BoxDecoration(
         //borderRadius: BorderRadius.all(Radius.circular(20)),
-        color: group.getColor(), //expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
+        color: group
+            .getColor(), //expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
       ),
       child: Center(
         child: Text(
@@ -237,39 +237,60 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
   }
 
   _submitButton() {
-    return FlatButton(
+    return Container(
+      width: 200,
+      height: 40,
+      child: OutlineButton(
+        color: Colors.blue,
+        borderSide: BorderSide(
+          width: 2,
+          color: lightGreyColor,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        onPressed: () => _buttonOnPress(),
+        child: Text(
+          "Confirm",
+          style: TextStyle(fontSize: 16, color: Colors.white),
+        ),
+      ),
+    );
+
+    /*return FlatButton(
       color: Colors.blue,
       height: 40,
       minWidth: 200,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      onPressed: () {
-        FilterSetting filterSetting = new FilterSetting();
-
-        if(filterByExpenses) {
-          filterSetting.filterType = FilterType.Expense;
-        } else if(filterByIncome){
-          filterSetting.filterType = FilterType.Income;
-        } else if(filterByDate) {
-          filterSetting.filterType = FilterType.Date;
-        } else if(filterByGroup) {
-          filterSetting.filterType = FilterType.Group;
-          filterSetting.group = selectedGroup;
-        }
-
-        filterSetting.isAscending = (selectedOrderType.compareTo("Ascending") == 0) ? true : false;
-
-        MyHomePage.filterSetting = filterSetting;
-        Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
-      },
+      onPressed: () => _buttonOnPress(),
       child: Text(
         "Confirm",
-        style: TextStyle(
-            fontSize: 16,
-            color: Colors.white
-        ),
+        style: TextStyle(fontSize: 16, color: Colors.white),
       ),
-    );
+    );*/
+  }
+
+  _buttonOnPress() {
+    FilterSetting filterSetting = new FilterSetting();
+
+    if (filterByExpenses) {
+      filterSetting.filterType = FilterType.Expense;
+    } else if (filterByIncome) {
+      filterSetting.filterType = FilterType.Income;
+    } else if (filterByDate) {
+      filterSetting.filterType = FilterType.Date;
+    } else if (filterByGroup) {
+      filterSetting.filterType = FilterType.Group;
+      filterSetting.group = selectedGroup;
+    }
+
+    filterSetting.isAscending =
+        (selectedOrderType.compareTo("Ascending") == 0) ? true : false;
+
+    MyHomePage.filterSetting = filterSetting;
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MyHomePage()));
   }
 }
