@@ -156,6 +156,10 @@ class SQLiteDbProvider {
     await db.insert("Expenses", expense.toMap());
   }
 
+  /// Retrieves all expenses during the in [date] specified month
+  ///
+  /// Also determines with the Filter in [MyHomePage] which expenses to show.
+  /// Default is filtered by month with the date descending (most recent expense on top of the list)
   Future<List<Expense>> getExpenses(DateTime date) async {
     final db = await database;
 
@@ -163,6 +167,7 @@ class SQLiteDbProvider {
     int endDate = (new DateTime(date.year, date.month+1, 0)).millisecondsSinceEpoch;
     FilterSetting filter = MyHomePage.filterSetting;
     String filterType = filter.filterType.toString().split(".")[1];
+    String orderAscDesc = filter.isAscending ? "ASC" : "DESC";
 
 
     var query = "";
@@ -171,7 +176,6 @@ class SQLiteDbProvider {
       case FilterType.Expense:
       case FilterType.Income:
         //Select only income or expenses but not both
-        String orderAscDesc = filter.isAscending ? "ASC" : "DESC";
         query = "SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.type = '$filterType' AND e.date BETWEEN $beginningDate AND $endDate ORDER BY e.date $orderAscDesc";
         break;
       case FilterType.Group:
@@ -180,21 +184,15 @@ class SQLiteDbProvider {
         break;
       case FilterType.Date:
       default:
-        String orderAscDesc = filter.isAscending ? "ASC" : "DESC";
         query = "SELECT * from Expenses e JOIN Expensegroup g ON e.groupId = g.ROWID AND e.date BETWEEN $beginningDate AND $endDate ORDER BY e.date $orderAscDesc";
         break;
     }
 
     var result = await db.rawQuery(query);
-
-
     List<Expense> expenses = new List<Expense>();
 
     var iterator = result.iterator;
-
-    while (iterator.moveNext()) {
-      expenses.add(Expense.fromMap(iterator.current));
-    }
+    while (iterator.moveNext()) expenses.add(Expense.fromMap(iterator.current));
 
     return expenses;
   }

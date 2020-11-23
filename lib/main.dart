@@ -5,6 +5,7 @@ import 'package:financetracker/CreateExpense.dart';
 import 'package:financetracker/CreateManager.dart';
 import 'package:financetracker/Classes/Manager.dart';
 import 'package:financetracker/Helper/Database.dart';
+import 'package:financetracker/Helper/DialogHelper.dart';
 import 'package:financetracker/Helper/Overview.dart';
 import 'package:financetracker/Classes/FilterSetting.dart';
 import 'package:flutter/material.dart';
@@ -36,21 +37,21 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+/*FILTER*/
+List<String> filterOptions = ["Expenses", "Income", "Date", "Group"];
+String selectedType = "Expenses";
+String selectedOrderType = "Ascending";
+
+ExpenseGroup selectedGroup = defaultExpenseGroups[0];
+
+bool filterByExpenses = true;
+bool filterByIncome = false;
+bool filterByDate = false;
+bool filterByGroup = false;
+
+bool filterByAscDesc = true;
+
 class _MyHomePageState extends State<MyHomePage> {
-
-  /*FILTER*/
-  List<String> filterOptions = ["Expenses", "Income", "Date", "Group"];
-  String selectedType = "Expenses";
-  String selectedOrderType = "Ascending";
-
-  ExpenseGroup selectedGroup = defaultExpenseGroups[0];
-
-  bool filterByExpenses = true;
-  bool filterByIncome = false;
-  bool filterByDate = false;
-  bool filterByGroup = false;
-
-  bool filterByAscDesc = true;
 
   @override
   void initState() {
@@ -64,13 +65,14 @@ class _MyHomePageState extends State<MyHomePage> {
       else {
         //There already exists a manager for this month. Retrieve data
         MyHomePage.manager = mgr,
-        setState(() {})
+        //setState(() {})
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
@@ -92,10 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   IconButton(
                     icon: Icon(Icons.filter_list, color: Colors.black, size: 30,),
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => ExpenseFilterDialog(),
-                      );
+                      //OpenFilterDialog();
+                      DialogHelper.showFilterDialog(context);
                     },
                   ),
                 ],
@@ -124,17 +124,14 @@ class _MyHomePageState extends State<MyHomePage> {
       future: SQLiteDbProvider.db.getExpenses(DateTime.now()),
       builder: (context, snapshot) {
         if(snapshot.hasData) {
-          return _builder(snapshot.data);
+          return _expenseListBuilder(snapshot.data);
         }
         else if(snapshot.hasError) {
           return Column(
             children: [
               Text(
-                "Error while retrieving data. [${snapshot.error}]",
-                style: TextStyle(fontSize: 22, color: Colors.white),
-              ),
-              Container(
-
+                "Error while retrieving data:\n [${snapshot.error}]",
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ],
           );
@@ -158,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _builder(list) {
+  _expenseListBuilder(list) {
     return Expanded(
       child: ListView.builder(
         //padding: const EdgeInsets.only(top: 0, bottom: 100),
@@ -337,12 +334,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-
-
-  ExpenseFilterDialog() {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: _buildChild(),
+  OpenFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: _buildChild(),
+      )
     );
   }
 
@@ -572,10 +570,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
         filterSetting.isAscending = (selectedOrderType.compareTo("Ascending") == 0) ? true : false;
 
-        setState(() {
+        MyHomePage.filterSetting = filterSetting;
+        /*setState(() {
           MyHomePage.filterSetting = filterSetting;
-        });
-        Navigator.of(context).pop();
+        });*/
+        Navigator.of(context).pop(true);
       },
       child: Text(
         "Confirm",
