@@ -17,10 +17,14 @@ Color darkGreyColor = Color(0xFF1A1A1D);
 TextStyle basicStyle = new TextStyle(fontSize: 16, color: Colors.white);
 TextStyle errorTextStyle = new TextStyle(fontSize: 12, color: Colors.red);
 
+TextStyle graphDetailsTextStyle =
+    new TextStyle(fontSize: 20, color: Colors.white);
+
 String formatColor(String color) {
-  String colorWork = (color.length > 18) ?
-                  color.substring(35).split(")")[0] :  //Get rid of "Materialcolor(...)
-                  color.substring(6).split(")")[0];
+  String colorWork = (color.length > 18)
+      ? color.substring(35).split(")")[0]
+      : //Get rid of "Materialcolor(...)
+      color.substring(6).split(")")[0];
 
   return colorWork;
 }
