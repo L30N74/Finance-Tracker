@@ -261,14 +261,6 @@ class _ExpenseFilterDialogState extends State<ExpenseFilterDialog> {
         filterSetting.isAscending = (selectedOrderType.compareTo("Ascending") == 0) ? true : false;
 
         MyHomePage.filterSetting = filterSetting;
-        //Navigator.popUntil(context, ModalRoute.withName("/"));
-
-        //Navigator.pop(context, filterSetting);
-        //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
-
-        /*Navigator.pop(context, () {
-          setState(() { });
-        });*/
         Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
       },
       child: Text(
