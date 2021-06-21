@@ -39,6 +39,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   void initState() {
     super.initState();
@@ -46,24 +47,29 @@ class _MyHomePageState extends State<MyHomePage> {
     if (MyHomePage.manager == null) {
       SQLiteDbProvider.db.getCurrentManager().then(
             (mgr) => {
-              if (mgr == null)
-                {
-                  // Redirect user to page to create a new manager
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => CreateManager()))
-                }
-              else
-                {
-                  //There already exists a manager for this month. Retrieve data
-                  MyHomePage.manager = mgr,
-                }
-            },
-          );
+          if (mgr == null)
+            {
+              // Redirect user to page to create a new manager
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => CreateManager()))
+            }
+          else
+            {
+              //There already exists a manager for this month. Retrieve data
+              MyHomePage.manager = mgr,
+            }
+        },
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
+    if(MyHomePage.manager == null) {
+      throw Exception("No manager for this month. This shouldn't happen");
+    }
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,

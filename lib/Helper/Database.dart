@@ -41,13 +41,6 @@ class SQLiteDbProvider {
               ");"),
         );
 
-        /*await db.execute("CREATE TABLE Manager("
-            "starting_money TEXT,"
-            "spent_money TEXT DEFAULT 0.0,"
-            "remaining_money TEXT,"
-            "month TEXT"
-            ");");*/
-
         print("Manager table initialized.");
 
         await db.transaction(

@@ -29,26 +29,27 @@ class CreateManager extends StatelessWidget {
                 ),
                 controller: controller,
                 keyboardType: TextInputType.number,
+                keyboardAppearance: Brightness.dark,
               ),
             ),
-            //Text("€", style: TextStyle(fontSize: 22),),
             RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text("Submit"),
-                onPressed: () => {
-                      SQLiteDbProvider.db
-                          .insertNewManager(
-                              double.parse(controller.value.text),
-                              DateFormat.yM()
-                                  .format(new DateTime(now.year, now.month, 1)))
-                          .then((mgr) => {
-                                MyHomePage.manager = mgr,
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => MyHomePage()))
-                              })
-                    }),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text("Submit"),
+              onPressed: () => {
+                SQLiteDbProvider.db
+                    .insertNewManager(
+                        double.parse(controller.value.text),
+                        DateFormat.yM()
+                            .format(new DateTime(now.year, now.month, 1)))
+                    .then((mgr) => {
+                          MyHomePage.manager = mgr,
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => MyHomePage())),
+                        }),
+              },
+            ),
           ],
         ),
       ),
