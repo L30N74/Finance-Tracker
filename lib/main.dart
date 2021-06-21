@@ -65,11 +65,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     if(MyHomePage.manager == null) {
-      throw Exception("No manager for this month. This shouldn't happen");
+      SQLiteDbProvider.db.getCurrentManager()
+      .then((mgr) =>  {
+          setState(() {
+            MyHomePage.manager = mgr;
+          })
+        })
+      .catchError((error) => throw Exception(error));
     }
 
+    setState(() {
+
+    });
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
