@@ -160,6 +160,11 @@ class SQLiteDbProvider {
     await db.transaction((txn) => txn.insert("Expenses", expense.toMap()));
   }
 
+  Future<void> removeExpense(Expense expense) async {
+    final db = await database;
+    await db.transaction((txn) => txn.delete("Expenses", where: "name = ?", whereArgs: [expense.name]));
+  }
+
   /// Retrieves all expenses during the in [date] specified month
   ///
   /// Also determines with the Filter in [MyHomePage] which expenses to show.
