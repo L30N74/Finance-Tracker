@@ -26,7 +26,6 @@ class _CreateExpenseState extends State<CreateExpense> {
 
   bool shouldRepeat = false;
   Color pickerColor = Color(0xFF44a49);
-  Color currentColor = Color(0xFF44a49);
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +309,14 @@ class _CreateExpenseState extends State<CreateExpense> {
                   "Create Group",
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () => _colorPickerPopup()),
+                onPressed: () => _colorPickerPopup(edit: false)
+            ),
+            IconButton(
+              icon: Icon(Icons.edit),
+              iconSize: 26,
+              color: Colors.white,
+              onPressed: () => _colorPickerPopup(edit: true),
+            ),
           ],
         ),
       ],
@@ -353,12 +359,17 @@ class _CreateExpenseState extends State<CreateExpense> {
     }
   }
 
-  _colorPickerPopup() {
+  _colorPickerPopup({bool edit}) {
+    if(edit)
+      pickerColor = newExpense.group.getColor();
+
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text(
+              edit == true ?
+              "Edit the group" :
               "Create a new Group",
               textAlign: TextAlign.center,
             ),
@@ -369,9 +380,10 @@ class _CreateExpenseState extends State<CreateExpense> {
                   children: [
                     TextFormField(
                       decoration: InputDecoration(
-                        labelText: "The group's name",
+                        labelText:  "The group's name",
                         labelStyle: TextStyle(),
                       ),
+                      initialValue: edit ? newExpense.group.name : null,
                       validator: (String value) {
                         return value.length == 0
                             ? "Please enter something"
@@ -384,7 +396,6 @@ class _CreateExpenseState extends State<CreateExpense> {
                     BlockPicker(
                         pickerColor: pickerColor,
                         onColorChanged: (Color color) {
-                          print(color);
                           setState(() {
                             pickerColor = color;
                           });
@@ -408,14 +419,17 @@ class _CreateExpenseState extends State<CreateExpense> {
                           _colorFormKey.currentState.save();
 
                           setState(() => {
-                                currentColor = pickerColor,
                                 newExpense.group.setColor(pickerColor),
-
-                                //Notify database
-                                SQLiteDbProvider.db
+                                edit ? {
+                                  SQLiteDbProvider.db.updateExpenseGroup(newExpense.group),
+                                }
+                                : {
+                                  //Notify database
+                                  SQLiteDbProvider.db
                                     .insertNewGroup(newExpense.group)
                                     .then(
                                         (value) => newExpense.group.id = value),
+                                }
                               });
                           Navigator.of(context).pop();
                         }

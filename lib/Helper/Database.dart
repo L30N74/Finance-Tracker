@@ -258,6 +258,11 @@ class SQLiteDbProvider {
         [group.name, group.color]));
   }
 
+  updateExpenseGroup(ExpenseGroup group) async {
+    var db = await database;
+    await db.transaction((txn) => txn.update("ExpenseGroup", group.toMap(), where: "ROWID = ?", whereArgs: [group.id]));
+  }
+
   Future<ExpenseGroup> getGroupById(ExpenseGroup group) async {
     var db = await database;
     var result = await db

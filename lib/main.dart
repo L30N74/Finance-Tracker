@@ -42,10 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if(MyHomePage.manager != null) {
-      return MainPage();
-    }
-
     SQLiteDbProvider.db.getCurrentManager().then(
           (mgr) => {
         if (mgr == null)
@@ -65,10 +61,10 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
 
-    return MainPage();
+    return mainPage();
   }
 
-  Widget MainPage() {
+  Widget mainPage() {
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
