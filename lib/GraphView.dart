@@ -22,6 +22,9 @@ class _GraphViewState extends State<GraphView> {
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
         body: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             //Overview(),
             filterContainer(),
@@ -30,11 +33,8 @@ class _GraphViewState extends State<GraphView> {
               height: 10,
             ),
             detailsView(),
-            Spacer(),
             returnButton(),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20,),
           ],
         ),
       ),
@@ -46,7 +46,7 @@ class _GraphViewState extends State<GraphView> {
       padding: EdgeInsets.only(left: 20, right: 50),
       margin: EdgeInsets.only(top: 20),
       height: 100,
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
@@ -202,6 +202,7 @@ class _GraphViewState extends State<GraphView> {
           colorFn: (Manager manager, _) =>
               charts.ColorUtil.fromDartColor(Colors.green)),
     ];
+
     return series;
   }
 
@@ -266,12 +267,21 @@ class _GraphViewState extends State<GraphView> {
   }
 
   Widget detailsView() {
-    if (selectedEntry == null) return Container();
+    if (selectedEntry == null) return Container(
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          Text(
+            "Tap on an entry in the above graph to view details",
+            style: TextStyle(fontSize: 25, color: Colors.white), textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+
     final Manager selectedManager = selectedEntry.selectedDatum.first.datum;
 
-    return Container(
-      height: 200,
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+    return Expanded(
       child: Column(
         children: [
           Text(
@@ -285,27 +295,27 @@ class _GraphViewState extends State<GraphView> {
           SizedBox(
             height: 15,
           ),
-          groupExpenseOverview(selectedManager),
-          SizedBox(
-            height: 20,
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "You started the month with ${selectedManager.startingMoney.toString()}€",
+                "You started the month with ${selectedManager.startingMoney.toStringAsFixed(2)}€",
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               Text(
-                "Total expenses: ${selectedManager.spentMoney.toString()}€",
+                "Total expenses: ${selectedManager.spentMoney.toStringAsFixed(2)}€",
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               Text(
-                "Total saved: ${selectedManager.remainingMoney.toString()}€",
+                "Total saved: ${selectedManager.remainingMoney.toStringAsFixed(2)}€",
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ],
           ),
+          SizedBox(
+            height: 20,
+          ),
+          groupExpenseOverview(selectedManager),
         ],
       ),
     );
@@ -316,20 +326,27 @@ class _GraphViewState extends State<GraphView> {
       child: FutureBuilder(
         future: SQLiteDbProvider.db.getExpensesFromGroups(selectedManager),
         builder: (context, snapshot) {
-          if (snapshot.hasError) return Container();
+          if (snapshot.hasError) return Container(
+            child: Text("An error occurred", style: errorTextStyle,),
+          );
           if (snapshot.hasData) {
             Map<ExpenseGroup, double> expenses = snapshot.data;
-            List<MapEntry<ExpenseGroup, double>> list =
-                expenses.entries.toList();
+
+            // Take away lists with zero listed expenses
+            for(int i = expenses.entries.length-1; i > 0; i--) {
+              if(expenses.values.elementAt(i) == 0.0) expenses.remove(expenses.keys.elementAt(i));
+            }
 
             return ListView.builder(
               itemCount: expenses.length,
               itemBuilder: (context, index) {
-                ExpenseGroup group = list[index].key;
-                double spentAmount = list[index].value;
+                ExpenseGroup group = expenses.keys.elementAt(index);
+                double spentAmount = expenses.values.elementAt(index);
 
                 return Container(
                   margin: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
                     bottom: 15,
                   ),
                   child: Row(

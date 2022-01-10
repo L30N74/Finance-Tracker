@@ -103,6 +103,12 @@ class SQLiteDbProvider {
     print("INFO [Groups reset]");
   }
 
+  resetEverything() async {
+    await resetManagerTable();
+    await resetExpensesTable();
+    await resetGroupsTable();
+  }
+
   ///Retrieves the manager for this month
   ///
   /// Returns a [Manager] if there is one for this month, otherwise [null] if there isn't

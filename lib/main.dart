@@ -40,32 +40,34 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
-  void initState() {
-    super.initState();
-
-    if (MyHomePage.manager == null) {
-      SQLiteDbProvider.db.getCurrentManager().then(
-            (mgr) => {
-              if (mgr == null)
-                {
-                  // Redirect user to page to create a new manager
-                  print("No manager found. Redirecting."),
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => CreateManager()))
-                }
-              else
-                {
-                  //There already exists a manager for this month. Retrieve data
-                  print("Manager found."),
-                  MyHomePage.manager = mgr,
-                }
-            },
-          );
+  Widget build(BuildContext context) {
+    if(MyHomePage.manager != null) {
+      return MainPage();
     }
+
+    SQLiteDbProvider.db.getCurrentManager().then(
+          (mgr) => {
+        if (mgr == null)
+          {
+            // Redirect user to page to create a new manager
+            print("No manager found. Redirecting."),
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => CreateManager()))
+          }
+        else
+          {
+            //There already exists a manager for this month. Retrieve data
+            print("Manager found."),
+            MyHomePage.manager = mgr,
+
+          }
+      },
+    );
+
+    return MainPage();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget MainPage() {
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
@@ -81,22 +83,13 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: Container(
           width: 60,
           height: 60,
-          child: myFLoatingActionButton(),
-          /*FloatingActionButton(
-            backgroundColor: Colors.blue,
-            child: Icon(
-              Icons.add,
-              size: 28,
-            ),
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => CreateExpense())),
-          ),*/
+          child: myFloatingActionButton(),
         ),
       ),
     );
   }
 
-  Widget myFLoatingActionButton() {
+  Widget myFloatingActionButton() {
     return Container(
       width: 200,
       height: 40,
@@ -309,10 +302,11 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             MaterialButton(
-              child: Text("Debug Print"),
+              child: Text("Reset all"),
               onPressed: () {
                 setState(() {
-                  SQLiteDbProvider.db.resetGroupsTable();
+                  SQLiteDbProvider.db.resetEverything();
+                  MyHomePage.manager = null;
                 });
               },
             ),
