@@ -41,43 +41,34 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   @override
-  void initState() {
-    super.initState();
-
-    if (MyHomePage.manager == null) {
-      SQLiteDbProvider.db.getCurrentManager().then(
-            (mgr) => {
-          if (mgr == null)
-            {
-              // Redirect user to page to create a new manager
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => CreateManager()))
-            }
-          else
-            {
-              //There already exists a manager for this month. Retrieve data
-              MyHomePage.manager = mgr,
-            }
-        },
-      );
+  Widget build(BuildContext context) {
+    if(MyHomePage.manager != null) {
+      return MainPage();
     }
+
+    SQLiteDbProvider.db.getCurrentManager().then(
+          (mgr) => {
+        if (mgr == null)
+          {
+            // Redirect user to page to create a new manager
+            print("No manager found. Redirecting."),
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => CreateManager()))
+          }
+        else
+          {
+            //There already exists a manager for this month. Retrieve data
+            print("Manager found."),
+            MyHomePage.manager = mgr,
+
+          }
+      },
+    );
+
+    return MainPage();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if(MyHomePage.manager == null) {
-      SQLiteDbProvider.db.getCurrentManager()
-      .then((mgr) =>  {
-          setState(() {
-            MyHomePage.manager = mgr;
-          })
-        })
-      .catchError((error) => throw Exception(error));
-    }
-
-    setState(() {
-
-    });
+  Widget MainPage() {
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
@@ -323,11 +314,14 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             graphRedirectButton(),
-            SizedBox(
-              width: 100,
-            ),
-            SizedBox(
-              width: 100,
+            MaterialButton(
+              child: Text("Reset all"),
+              onPressed: () {
+                setState(() {
+                  SQLiteDbProvider.db.resetEverything();
+                  MyHomePage.manager = null;
+                });
+              },
             ),
           ],
         ),
@@ -372,7 +366,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 200,
             child: Column(
               children: [
-                Text("How much money is at your disposal this month?"),
+                Text("Allowance this month?"),
                 SizedBox(
                   height: 50,
                 ),

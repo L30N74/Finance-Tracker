@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 List<ExpenseGroup> defaultExpenseGroups = [
   new ExpenseGroup(name: "Default", color: formatColor(Colors.red.toString())),
-  new ExpenseGroup(name: "Hobby", color: formatColor(Colors.green.toString())),
+  new ExpenseGroup(name: "Food", color: formatColor(Colors.blue.toString())),
 ];
 
 Color mainPageBackgroundColor = Color(0xFF212128);
