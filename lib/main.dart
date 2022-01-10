@@ -38,25 +38,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool redirected = false;
-  bool loading = true;
 
   @override
   Widget build(BuildContext context) {
-    if(MyHomePage.manager != null) {
-      return mainPage();
-    }
-
-    return FutureBuilder<Manager>(
-      future: SQLiteDbProvider.db.getCurrentManager(),
-      builder: (ctx, snapshot) {
-        if(!snapshot.hasData) return waitingIndicator();
-        if(snapshot.hasError) return errorIndicator(snapshot.error);
-
-        MyHomePage.manager = snapshot.data;
-        return mainPage();
+    SQLiteDbProvider.db.getCurrentManager().then((mgr) => {
+        if (mgr == null) {
+            // Redirect user to page to create a new manager
+            print("No manager found. Redirecting."),
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => CreateManager()))
+        }
+        else {
+            //There already exists a manager for this month. Retrieve data
+            print("Manager found."),
+            MyHomePage.manager = mgr,
+        }
       },
     );
+    
+    return mainPage();
   }
 
   Widget errorIndicator(error) {
@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+            
   Widget waitingIndicator() {
     return Container(
       height: 30,
@@ -390,8 +391,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future createManagerAlert(BuildContext context) {
     TextEditingController controller = TextEditingController();
-    redirected = true;
-
+    
     return showDialog(
       context: context,
       builder: (context) {
@@ -434,8 +434,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           (mgr) => {
                             setState(() => {
                               MyHomePage.manager = mgr,
-                              redirected = false,
-                              loading = false,
                               Navigator.of(context).pop()
 
                             }),
