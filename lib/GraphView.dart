@@ -13,7 +13,7 @@ class GraphView extends StatefulWidget {
 
 String filterOptionsValue = "3 Months";
 List<String> filterOptions = ["1 Month", "3 Months", "6 Months", "12 Months"];
-charts.SelectionModel selectedEntry;
+Manager selectedManager;
 
 class _GraphViewState extends State<GraphView> {
   @override
@@ -128,7 +128,7 @@ class _GraphViewState extends State<GraphView> {
   buildGraph(context, snapshot, numOfMonthsToShow) {
     if (snapshot.hasError) return Container();
 
-    if (snapshot.hasData)
+    if (snapshot.hasData) {
       return charts.BarChart(
         buildSeries(snapshot.data),
         animate: true,
@@ -142,7 +142,7 @@ class _GraphViewState extends State<GraphView> {
           new charts.SelectionModelConfig(
             changedListener: (charts.SelectionModel model) {
               setState(() {
-                selectedEntry = model;
+                selectedManager = model.selectedDatum.first.datum;
               });
             },
           ),
@@ -151,7 +151,7 @@ class _GraphViewState extends State<GraphView> {
           viewport: charts.OrdinalViewport("0", numOfMonthsToShow),
         ),
       );
-
+    }
     // Waiting for data to load
     return Column(
       children: [
@@ -186,7 +186,6 @@ class _GraphViewState extends State<GraphView> {
         measureFn: (Manager manager, _) => manager.startingMoney,
         colorFn: (_, __) => charts.ColorUtil.fromDartColor(Colors.blue),
       ),
-      //charts.ColorUtil.fromDartColor(Colors.blue).lighter),
       charts.Series(
           id: "Spent",
           data: data,
@@ -269,18 +268,14 @@ class _GraphViewState extends State<GraphView> {
   Widget detailsView() {
     if (selectedEntry == null) return Container(
       alignment: Alignment.center,
-      child: Column(
-        children: [
-          Text(
-            "Tap on an entry in the above graph to view details",
-            style: TextStyle(fontSize: 25, color: Colors.white), textAlign: TextAlign.center,
-          ),
-        ],
+      child: Text(
+          "Tap on an entry in the diagram to see more infos about it"
+          style: TextStyle(fontSize: 25, color: Colors.white), textAlign: TextAlign.center,
       ),
     );
-
+    
     final Manager selectedManager = selectedEntry.selectedDatum.first.datum;
-
+    
     return Expanded(
       child: Column(
         children: [
@@ -392,7 +387,7 @@ class _GraphViewState extends State<GraphView> {
         borderRadius: BorderRadius.circular(25),
       ),
       onPressed: () {
-        selectedEntry = null;
+        selectedManager = null;
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage()),
