@@ -574,6 +574,7 @@ class _CreateExpenseState extends State<CreateExpense> {
         if (_mainFormKey.currentState.validate()) {
           _mainFormKey.currentState.save();
 
+
           // Calculate new money pools and push new expense to database
           MyHomePage.manager.handleExpense(newExpense);
 

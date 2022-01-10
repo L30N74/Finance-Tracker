@@ -24,7 +24,7 @@ class Manager {
         "month": month
       };
 
-  ///Handles the update of trackers
+  /// Handles the update of trackers and calls the database for the new entry
   ///
   /// In case that the [expense]'s ExpenseType is of Type Expense, [spentMoney] will be increased by the [expense]'s amount
   /// I don't want to decrease spent money when receiving some.
@@ -43,10 +43,24 @@ class Manager {
     SQLiteDbProvider.db.updateManager(this);
   }
 
+
   /// Returns whether or not the manager is current
   ///
   /// Returns: true is the month part is the same as the current month
   bool isUpToDate() {
     return int.tryParse(this.month.split("/")[0]) == DateTime.now().month;
+
+  /// Handles the update of trackers and calls the database
+  void reverseExpense(Expense expense) {
+    if (expense.type == ExpenseType.Expense) {
+      spentMoney -= expense.amount;
+      remainingMoney += expense.amount;
+    } else
+      remainingMoney -= expense.amount;
+
+    //Notify database of the change
+    SQLiteDbProvider.db.removeExpense(expense);
+    SQLiteDbProvider.db.updateManager(this);
+
   }
 }
