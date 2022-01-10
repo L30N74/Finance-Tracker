@@ -574,9 +574,6 @@ class _CreateExpenseState extends State<CreateExpense> {
         if (_mainFormKey.currentState.validate()) {
           _mainFormKey.currentState.save();
 
-          //Save Expense in database
-          SQLiteDbProvider.db.insertNewExpense(newExpense);
-
           //Calculate new money pools (spent money and remaining money)
           MyHomePage.manager.handleExpense(newExpense);
 
