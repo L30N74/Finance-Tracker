@@ -2,6 +2,7 @@ import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
 import 'package:financetracker/CreateExpense.dart';
 import 'package:financetracker/Classes/Manager.dart';
+import 'package:financetracker/CreateManager.dart';
 import 'package:financetracker/GraphView.dart';
 import 'package:financetracker/Helper/Database.dart';
 import 'package:financetracker/Helper/DialogHelper.dart';

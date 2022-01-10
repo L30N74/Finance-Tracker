@@ -49,6 +49,7 @@ class Manager {
   /// Returns: true is the month part is the same as the current month
   bool isUpToDate() {
     return int.tryParse(this.month.split("/")[0]) == DateTime.now().month;
+  }
 
   /// Handles the update of trackers and calls the database
   void reverseExpense(Expense expense) {
