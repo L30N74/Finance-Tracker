@@ -33,7 +33,7 @@ class _OverviewState extends State<Overview> {
                   style: basicStyle,
                 ),
                 Text(
-                  MyHomePage.manager != null ?  MyHomePage.manager.startingMoney.toStringAsFixed(2) + " €" : "<ERROR>",
+                  MyHomePage.manager != null ?  MyHomePage.manager.startingMoney.toStringAsFixed(2) + " €" : "<Not set>",
                   style: basicStyle,
                 ),
               ],
@@ -45,7 +45,7 @@ class _OverviewState extends State<Overview> {
                   children: [
                     Text("Spent:", style: basicStyle,),
                     Text(
-                      MyHomePage.manager != null ? MyHomePage.manager.spentMoney.toStringAsFixed(2) + " €" : "<ERROR>",
+                      MyHomePage.manager != null ? MyHomePage.manager.spentMoney.toStringAsFixed(2) + " €" : "<Not set>",
                       style: TextStyle(
                         fontSize: 26,
                         color: Colors.white
@@ -57,7 +57,7 @@ class _OverviewState extends State<Overview> {
                   children: [
                     Text("Remaining:", style: basicStyle,),
                     Text(
-                      MyHomePage.manager != null ? MyHomePage.manager.remainingMoney.toStringAsFixed(2) + " €" : "<ERROR>",
+                      MyHomePage.manager != null ? MyHomePage.manager.remainingMoney.toStringAsFixed(2) + " €" : "<Not set>",
                       style: TextStyle(
                         fontSize: 26,
                         color: Colors.white,

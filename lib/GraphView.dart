@@ -266,15 +266,13 @@ class _GraphViewState extends State<GraphView> {
   }
 
   Widget detailsView() {
-    if (selectedEntry == null) return Container(
+    if (selectedManager == null) return Container(
       alignment: Alignment.center,
       child: Text(
-          "Tap on an entry in the diagram to see more infos about it"
+          "Tap on an entry in the diagram to see more infos about it",
           style: TextStyle(fontSize: 25, color: Colors.white), textAlign: TextAlign.center,
       ),
     );
-    
-    final Manager selectedManager = selectedEntry.selectedDatum.first.datum;
     
     return Expanded(
       child: Column(

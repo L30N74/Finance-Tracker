@@ -1,7 +1,6 @@
 import 'package:financetracker/Classes/Constants.dart';
 import 'package:financetracker/Classes/Expense.dart';
 import 'package:financetracker/CreateExpense.dart';
-import 'package:financetracker/CreateManager.dart';
 import 'package:financetracker/Classes/Manager.dart';
 import 'package:financetracker/GraphView.dart';
 import 'package:financetracker/Helper/Database.dart';
@@ -39,43 +38,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool redirected = false;
+  bool loading = true;
 
   @override
   Widget build(BuildContext context) {
     if(MyHomePage.manager != null) {
-      return MainPage();
+      return mainPage();
     }
 
-    SQLiteDbProvider.db.getCurrentManager().then(
-          (mgr) => {
-        if (mgr == null)
-          {
-            // Redirect user to page to create a new manager
-            print("No manager found. Redirecting."),
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => CreateManager()))
-          }
-        else
-          {
-            //There already exists a manager for this month. Retrieve data
-            print("Manager found."),
-            MyHomePage.manager = mgr,
+    return FutureBuilder<Manager>(
+      future: SQLiteDbProvider.db.getCurrentManager(),
+      builder: (ctx, snapshot) {
+        if(!snapshot.hasData) return waitingIndicator();
+        if(snapshot.hasError) return errorIndicator(snapshot.error);
 
-          }
+        MyHomePage.manager = snapshot.data;
+        return mainPage();
       },
     );
-
-    return MainPage();
   }
 
-  Widget MainPage() {
+  Widget errorIndicator(error) {
+    return Container(
+      child: Text(
+        "Error retrieveing manager. \n${error.toString()}\nPlease restart",
+        style: errorTextStyle,
+      ),
+    );
+  }
+  Widget waitingIndicator() {
+    return Container(
+      height: 30,
+      width: MediaQuery.of(context).size.width/2,
+      alignment: Alignment.center,
+      child: LinearProgressIndicator(),
+    );
+  }
+
+  Widget mainPage() {
     return SafeArea(
       child: Scaffold(
         backgroundColor: mainPageBackgroundColor,
         body: Column(
           children: <Widget>[
             Overview(),
-            middleRow(),
+            filterRow(),
             showExpenses(),
           ],
         ),
@@ -116,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget middleRow() {
+  Widget filterRow() {
     return Container(
       height: 50,
       child: Row(
@@ -207,10 +215,37 @@ class _MyHomePageState extends State<MyHomePage> {
   _expenseListBuilder(list) {
     return Expanded(
       child: ListView.builder(
-          //padding: const EdgeInsets.only(top: 0, bottom: 100),
           itemCount: list.length,
-          itemBuilder: (BuildContext context, int index) =>
-              createExpenseItem(list[index])),
+          itemBuilder: (BuildContext context, int index) {
+            Expense expense = list[index];
+            return Dismissible(
+              key: Key(expense.name),
+              child: createExpenseItem(expense),
+              onDismissed: (direction) {
+                setState(() {
+                  // Remove expense from database
+                  list.remove(expense);
+                  MyHomePage.manager.reverseExpense(expense);
+                  Scaffold.of(context).showSnackBar(new SnackBar(
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        setState(() {
+                          MyHomePage.manager.handleExpense(expense);
+                        });
+                      },
+                    ),
+                    content: Text("${expense.name} removed"),
+                  ));
+                });
+              },
+              background: Container(
+                color: Colors.red,
+                child: Icon(Icons.delete, color: Colors.black, size: 30),
+              ),
+            );
+          }
+      )  //createExpenseItem(list[index], list)),
     );
   }
 
@@ -239,14 +274,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                   color: expense.group
-                      .getColor(), //expense.type == ExpenseType.Expense ? Color.fromRGBO(200, 10, 30, 1) : Colors.green, //Color.fromRGBO(10, 150, 30, 1),
+                      .getColor(),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10),
                 child: Text(
-                  expense
-                      .getDateAsString(), // DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(list.data[index].date)),
+                  expense.getDateAsString(),
                   style: TextStyle(),
                 ),
               ),
@@ -356,6 +390,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future createManagerAlert(BuildContext context) {
     TextEditingController controller = TextEditingController();
+    redirected = true;
 
     return showDialog(
       context: context,
@@ -397,8 +432,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         )
                         .then(
                           (mgr) => {
-                            MyHomePage.manager = mgr,
-                            Navigator.of(context).pop()
+                            setState(() => {
+                              MyHomePage.manager = mgr,
+                              redirected = false,
+                              loading = false,
+                              Navigator.of(context).pop()
+
+                            }),
                           },
                         ),
                   },
